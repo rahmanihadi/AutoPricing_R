@@ -1,0 +1,7 @@
+__pycache__
+.Rhistory
+
+test_stuff_txt.txt
+test.json
+
+*.json
