@@ -9,7 +9,7 @@
 PrepareDatauploading <- function(Brand, Product, Transaction, DataDictionary,
   DataFiles, DataInfoFile, DatePattern) {
   
-  closeAllConnections()
+  # closeAllConnections()
   # Possbile modifications:
   # --- Print into file ... that is not clever
   # --- the dafaframe of DataDictionary can be an input instead of the file
@@ -20,9 +20,9 @@ PrepareDatauploading <- function(Brand, Product, Transaction, DataDictionary,
   # Product <- 'PC'
   # Transaction <- 'NBS'
   # DataDictionary <- "C:/Users/HRahmaniBayegi/softs/pricing/Dictionaries/DataDictionary/Data_Dictionary_v3.6.csv"
-  # DataFiles <- c("C:/Users/HRahmaniBayegi/data_test\\\\RNW_RAC_PC_NBS_ALL - Final_dummy_11.csv") #,
-  #   # "C:/Users/HRahmaniBayegi/data_test\\\\NBS_RAC_PC_NBS_ALL - Final_1.csv",
-  #   # "C:/Users/HRahmaniBayegi/data_test\\\\Crunch_RNW_RAC_PC_NBS_ALL - Final.csv")
+  # DataFiles <- c("C:/Users/HRahmaniBayegi/data_test\\\\RNW_RAC_PC_NBS_ALL - Final_dummy_11.csv",
+  #   "C:/Users/HRahmaniBayegi/data_test\\\\NBS_RAC_PC_NBS_ALL - Final_1.csv",
+  #   "C:/Users/HRahmaniBayegi/data_test\\\\Crunch_RNW_RAC_PC_NBS_ALL - Final.csv")
   # DataInfoFile <- "C:/Users/HRahmaniBayegi/softs/pricing/AutoPricing_R/EarnixDataInfo.json"
   # DatePattern <- 'yyyy-mm-dd'
     
@@ -38,9 +38,9 @@ PrepareDatauploading <- function(Brand, Product, Transaction, DataDictionary,
   
   Stu_Counter <- 0
 
-  sink(DataInfoFile)
+  # sink(DataInfoFile)
   
-  cat('[','\n')
+  # cat('[','\n')
 
     for(file in DataFiles){
       
@@ -52,8 +52,8 @@ PrepareDatauploading <- function(Brand, Product, Transaction, DataDictionary,
       
       # for print into file ... think of a more clever way !!!
       
-      cat('{','\n')
-      cat(paste0('"dataTableFile": "',file,'",'), "\n")
+      # cat('{','\n')
+      # cat(paste0('"dataTableFile": "',file,'",'), "\n")
     #
     
       if ( Source == "Aquote" ){
@@ -78,7 +78,7 @@ PrepareDatauploading <- function(Brand, Product, Transaction, DataDictionary,
     
     # for print into file ... think of a more clever way !!!
     
-    cat(paste0('"earnixTableName": "',TableName,'",'), "\n")
+    # cat(paste0('"earnixTableName": "',TableName,'",'), "\n")
     
     updated_dict <- UpdateDataDictionary(Brand, Product, Transaction, Source, DD)
     
@@ -88,26 +88,33 @@ PrepareDatauploading <- function(Brand, Product, Transaction, DataDictionary,
     
     map <- GetEarnixMapping(variables, updated_dict)
     
-    FakeJson('map', map)
+    # FakeJson('map', map)
 
     # fetch the variable types
     
     types <- GetDataType(variables, updated_dict)
     
     # print the variable type
-    FakeJson('Types', types)
+    # FakeJson('Types', types)
     
-    cat(paste0('"datePattern": "',DatePattern,'"\n'))
+    # cat(paste0('"datePattern": "',DatePattern,'"\n'))
     
     Stu_Counter <- Stu_Counter + 1
     LoopClose <- ifelse(Stu_Counter == length(DataFiles), "}\n", "},\n")
-    cat(LoopClose)
+    # cat(LoopClose)
+    info = list('dataTableFile'= file, 
+      'earnixTableName'= TableName,
+      'map'= map, 
+      'Types'= types, 
+      'datePattern'= DatePattern)
+    data_info <- append(data_info, list(info))
     }      
   
-  cat("]")
+  # cat("]")
   
-  sink()
-  closeAllConnections()
-  #return(map)
+  # sink()
+  # closeAllConnections()
+  jsonlite::write_json(data_info, 'test.json', pretty=TRUE, auto_unbox =T)
+  return(data_info)
   
 }
