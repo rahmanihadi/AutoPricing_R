@@ -7,11 +7,14 @@
 #********************************************************************************************************************#
 GetParameters <- function(Product, Transaction, ParameterFile, ConfigsFile){
   closeAllConnections()
-  ParameterFile <- "C:/Users/HRahmaniBayegi/softs/pricing/AutoPricing_R/EarnixParametersTemplate.json"
-  ConfigsFile = "C:/Users/HRahmaniBayegi/softs/pricing/AutoPricing/Src/Configs/ParametersTable.csv"
   
-  Product <- 'PC'
-  Transaction <- 'NBS'
+  #### Self working example inputs
+  
+  #ParameterFile <- "C:/Users/HRahmaniBayegi/softs/pricing/AutoPricing_R/EarnixParametersTemplate.json"
+  #ConfigsFile = "C:/Users/HRahmaniBayegi/softs/pricing/AutoPricing/Src/Configs/ParametersTable.csv"
+  
+  #Product <- 'PC'
+  #Transaction <- 'NBS'
   
   Product <- ifelse(Product == 'PC' | Product == 'LC', 'PCLC', Product) 
 
@@ -256,10 +259,10 @@ GetParameters <- function(Product, Transaction, ParameterFile, ConfigsFile){
     param_table <- all_table[mask_ver, c('Parameter', version, formula)]
     param_table[param_table==""] <-NA
     param_table <- param_table[complete.cases(param_table[ , 3]),]
-    print(nrow(param_table))
+    #print(nrow(param_table))
     names(param_table)[names(param_table)==formula] <- 'Formula'
     names(param_table)[names(param_table)==version] <- 'Version'
-    print(nrow(param_table))
+    #print(nrow(param_table))
     list_all <- list()
     
     for (i in 1:nrow(param_table)){
@@ -290,6 +293,6 @@ GetParameters <- function(Product, Transaction, ParameterFile, ConfigsFile){
   
   jsonlite::write_json(param_out, ParameterFile, pretty=TRUE, auto_unbox =T)
 
-  return(param_out)
+  #return(param_out)
   
 }

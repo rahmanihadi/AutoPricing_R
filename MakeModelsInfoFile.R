@@ -7,10 +7,10 @@
 #********************************************************************************************************************#
 MakeModelsInfoFile <- function(ModelFiles, ModelInfoFile){
   
-  ModelFiles <- c('C:/Users/HRahmaniBayegi/data_test\\RenewalDemand_H2OGLM_dummy_11.csv',
-    'C:/Users/HRahmaniBayegi/data_test\\testtable.csv')
-  #ModelFiles <- c('C:/Users/HRahmaniBayegi/data_test/elf_model_test\\Orig_Elf1_200226_0807.csv')
-  ModelInfoFile <- "EarnixModelInfo.json"
+  # ModelFiles <- c('C:/Users/HRahmaniBayegi/data_test\\RenewalDemand_H2OGLM_dummy_11.csv',
+  #   'C:/Users/HRahmaniBayegi/data_test\\testtable.csv')
+  # #ModelFiles <- c('C:/Users/HRahmaniBayegi/data_test/elf_model_test\\Orig_Elf1_200226_0807.csv')
+  # ModelInfoFile <- "EarnixModelInfo.json"
     
   model_info = list()
   models = list()

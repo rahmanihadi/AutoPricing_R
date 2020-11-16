@@ -14,20 +14,17 @@ PrepareDatauploading <- function(Brand, Product, Transaction, DataDictionary,
   # --- Print into file ... that is not clever
   # --- the dafaframe of DataDictionary can be an input instead of the file
   
-  source('C:/Users/HRahmaniBayegi/softs/pricing/AutoPricing_R/UpdateDataDictionary.R')
-  source("C:/Users/HRahmaniBayegi/softs/pricing/AutoPricing_R/GetEarnixMapping.R")
-  source("C:/Users/HRahmaniBayegi/softs/pricing/AutoPricing_R/GetDataType.R")
-  source("C:/Users/HRahmaniBayegi/softs/pricing/AutoPricing_R/FakeJson.R")
+
   
-  Brand <- 'RAC'
-  Product <- 'PC'
-  Transaction <- 'NBS'
-  DataDictionary <- "C:/Users/HRahmaniBayegi/softs/pricing/Dictionaries/DataDictionary/Data_Dictionary_v3.6.csv"
-  DataFiles <- c("C:/Users/HRahmaniBayegi/data_test\\\\RNW_RAC_PC_NBS_ALL - Final_dummy_11.csv", 
-    "C:/Users/HRahmaniBayegi/data_test\\\\NBS_RAC_PC_NBS_ALL - Final_1.csv", 
-    "C:/Users/HRahmaniBayegi/data_test\\\\Crunch_RNW_RAC_PC_NBS_ALL - Final.csv")
-  DataInfoFile <- "C:/Users/HRahmaniBayegi/softs/pricing/AutoPricing_R/EarnixDataInfo.json"
-  DatePattern <- 'yyyy-mm-dd'
+  # Brand <- 'RAC'
+  # Product <- 'PC'
+  # Transaction <- 'NBS'
+  # DataDictionary <- "C:/Users/HRahmaniBayegi/softs/pricing/Dictionaries/DataDictionary/Data_Dictionary_v3.6.csv"
+  # DataFiles <- c("C:/Users/HRahmaniBayegi/data_test\\\\RNW_RAC_PC_NBS_ALL - Final_dummy_11.csv") #,
+  #   # "C:/Users/HRahmaniBayegi/data_test\\\\NBS_RAC_PC_NBS_ALL - Final_1.csv",
+  #   # "C:/Users/HRahmaniBayegi/data_test\\\\Crunch_RNW_RAC_PC_NBS_ALL - Final.csv")
+  # DataInfoFile <- "C:/Users/HRahmaniBayegi/softs/pricing/AutoPricing_R/EarnixDataInfo.json"
+  # DatePattern <- 'yyyy-mm-dd'
     
   print("Create Earnix data info files \n")  
   
@@ -111,6 +108,6 @@ PrepareDatauploading <- function(Brand, Product, Transaction, DataDictionary,
   
   sink()
   closeAllConnections()
-  return(map)
+  #return(map)
   
 }
