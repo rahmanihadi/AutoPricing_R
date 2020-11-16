@@ -6,7 +6,7 @@
 #                                                                                                                    #
 #********************************************************************************************************************#
 GetParameters <- function(Product, Transaction, ParameterFile, ConfigsFile){
-  closeAllConnections()
+  # closeAllConnections()
   
   #### Self working example inputs
   
@@ -33,54 +33,8 @@ GetParameters <- function(Product, Transaction, ParameterFile, ConfigsFile){
   names(param_table)[names(param_table)==formula] <- 'Formula'
   
   keys <- unique(param_table$Folder)
-  
-  # library(Dict)
-  # library(reticulate)
-  # WJ <- import("WriteAsJson")
-  # custom_param <- dict()
-  # param_out = {}
-  # 
-  # for (key in keys){
-  #   
-  #   mask <- param_table$Folder == key
-  #   group <- param_table[mask,]
-  #   
-  #   if (grepl("\\", key, fixed = TRUE)){
-  #     library(stringr)
-  #     splited <- str_split(keys[2], "\\\\", simplify=TRUE)
-  #     folder <- splited[1]
-  #     n_exist <- sum(grepl(folder, keys, fixed = TRUE))
-  #     
-  #     if (n_exist == 0){
-  #       
-  #       custom_param[folder] <- dict()
-  #       
-  #     }
-  #     
-  #     DoLoop <- ifelse(length(splited)>2, c(1:length(splited)-1), 'BETE' )
-  #     if (DoLoop=='BETE'){ DoLoop<- seq_len(0)}
-  #     for(i in DoLoop){
-  #       
-  #       folder <- paste(c(folder,splited[i]), collapse = '\\') # "{}\\{}".format(folder, splited[i])
-  #       n_exist_1 <- sum(grepl(folder, keys, fixed = TRUE))
-  #       if (n_exist_1 !=0 ){custom_param[folder] <- dict()}
-  #       
-  #     }
-  #   }
-  #  
-  #   custom_param[paste(key)] <- group
-  #   
-  # }
-  # custom_param['CoreParam'] <- param_table
 
-  # param_table['ParameterComment'].fillna("NA", inplace=True)
-  # param_table['Version'].fillna("NA", inplace=True)
-  # param_table.rename({formula: 'Formula'}, axis='columns', inplace=True)
-  # param_table = param_table.groupby(['Folder'])
-  # param_out = {}
-  # custom_param = {}
-  # 
-#  sink('test.json')
+
   param_out <- list()
   custom_param <- list()
   
@@ -100,20 +54,21 @@ GetParameters <- function(Product, Transaction, ParameterFile, ConfigsFile){
       folder <- splited[1] 
       
       n_exist <- grep(paste0("^",folder,'$'), keys)
-      #print(n_exist)
+
       if (length(n_exist) == 0){
         
-        #print(paste0('Empty folder created, ',folder))
         custom_param[[folder]] <- list()
         
       }
       
       DoLoop <- ifelse(length(splited)>2, c(1:length(splited)-1), 'BETE' )
       if (DoLoop=='BETE'){ DoLoop<- seq_len(0)}
+      
       for(i in DoLoop){
         
         folder <- paste(c(folder,splited[i]), collapse = '\\') # "{}\\{}".format(folder, splited[i])
         n_exist_1 <- sum(grepl(folder, keys, fixed = TRUE))
+        
         if (n_exist_1 !=0 ){
           
           print(paste0('Empty folder created, ',folder))
@@ -125,40 +80,38 @@ GetParameters <- function(Product, Transaction, ParameterFile, ConfigsFile){
       }
     }    
     
+    # keys_sub <- names(tmp)
+    list_all <- NestedList(tmp)
     
+    # list_all <- list()
     
-    keys_sub <- names(tmp)
+    # for (i in 1:nrow(tmp)){
+    #   
+    #   tmp_i <- tmp[i,]
+    #   list_tmp <- list()
+    #   
+    #   # each row of tmp (tmp_i) is converted to a list (like Python dictionary)
+    #   
+    #   for (name in keys_sub){
+    #     
+    #     list_tmp[[as.character(name)]] <- as.character(tmp_i[[name]])
+    #     
+    #   }
+    #   
+    #   list_all[[i]] <- list_tmp
+    #   
+    # }
     
-    list_all <- list()
-    
-   # print(paste0('the Folder is :', key))
-    #print(paste0('The number of occurance is: ',nrow(tmp)))
-    
-    for (i in 1:nrow(tmp)){
-      
-      tmp_i <- tmp[i,]
-      list_tmp <- list()
-      
-      # each row of tmp (tmp_i) is converted to a list (like Python dictionary)
-      
-      for (name in keys_sub){
-        
-        list_tmp[[as.character(name)]] <- as.character(tmp_i[[name]])
-        
-      }
-      
-      list_all[[i]] <- list_tmp
-      
-    }
+    # print(identical(list_all, list_all_tmp))
+    # if(identical(list_all, list_all_tmp) == FALSE){print('Oh lalalalalalalalal')}
     
     custom_param[[as.character(key)]] <- list_all
     
   }
-  
+
   param_out[['CustomParameters']] = custom_param
 
-  closeAllConnections()  
-  
+
   # Core parameters
   
   mask_core <- all_table$Folder == 'CoreParameters' & all_table[[prod_trans]] == 'Y'
@@ -169,22 +122,24 @@ GetParameters <- function(Product, Transaction, ParameterFile, ConfigsFile){
   
   # converting the dataframe into a list
   
-  list_all <- list()
-  for (i in 1:nrow(param_table)){
-    
-    tmp_i <- param_table[i,]
-    list_tmp <- list()
-    
-    # each row of tmp (tmp_i) is converted to a list (like Python dictionary)
-    
-    for (name in names(tmp_i)){
-      
-      list_tmp[[as.character(name)]] <- as.character(tmp_i[[name]])
-      
-    }
-    
-    list_all[[i]] <- list_tmp
-  }
+  # list_all <- list()
+  list_all <- NestedList(param_table)
+  # for (i in 1:nrow(param_table)){
+  #   
+  #   tmp_i <- param_table[i,]
+  #   list_tmp <- list()
+  #   
+  #   # each row of tmp (tmp_i) is converted to a list (like Python dictionary)
+  #   
+  #   for (name in names(tmp_i)){
+  #     
+  #     list_tmp[[as.character(name)]] <- as.character(tmp_i[[name]])
+  #     
+  #   }
+  #   
+  #   list_all[[i]] <- list_tmp
+  #   
+  # }
   
   param_out[['CoreParameters']] <- list_all 
   
@@ -224,25 +179,26 @@ GetParameters <- function(Product, Transaction, ParameterFile, ConfigsFile){
   
   param_out[['DummyForBehavior']] = list_dummy
   
+  # list_all <- list()
   
-  list_all <- list()
+  # for (i in 1:nrow(param_table)){
+  #   
+  #   tmp_i <- param_table[i,]
+  #   list_tmp <- list()
+  #   
+  #   # each row of tmp (tmp_i) is converted to a list (like Python dictionary)
+  #   
+  #   for (name in names(tmp_i)){
+  #     
+  #     list_tmp[[as.character(name)]] <- as.character(tmp_i[[name]])
+  #     
+  #   }
+  #   
+  #   list_all[[i]] <- list_tmp
+  # }
   
-  for (i in 1:nrow(param_table)){
-    
-    tmp_i <- param_table[i,]
-    list_tmp <- list()
-    
-    # each row of tmp (tmp_i) is converted to a list (like Python dictionary)
-    
-    for (name in names(tmp_i)){
-      
-      list_tmp[[as.character(name)]] <- as.character(tmp_i[[name]])
-      
-    }
-    
-    list_all[[i]] <- list_tmp
-  }
-  
+  list_all <- NestedList(param_table)
+
   param_out[['BehaviorParameters']] = list_all
   
   # Some parameters have more than one modeling version
@@ -259,28 +215,29 @@ GetParameters <- function(Product, Transaction, ParameterFile, ConfigsFile){
     param_table <- all_table[mask_ver, c('Parameter', version, formula)]
     param_table[param_table==""] <-NA
     param_table <- param_table[complete.cases(param_table[ , 3]),]
-    #print(nrow(param_table))
+    
     names(param_table)[names(param_table)==formula] <- 'Formula'
     names(param_table)[names(param_table)==version] <- 'Version'
-    #print(nrow(param_table))
-    list_all <- list()
     
-    for (i in 1:nrow(param_table)){
-      
-      tmp_i <- param_table[i,]
-      list_tmp <- list()
-      
-      # each row of tmp (tmp_i) is converted to a list (like Python dictionary)
-      
-      for (name in names(tmp_i)){
-        
-        list_tmp[[as.character(name)]] <- as.character(tmp_i[[name]])
-        
-      }
-      
-      list_all[[i]] <- list_tmp
-    }
+    # list_all <- list()
     
+    # for (i in 1:nrow(param_table)){
+    #   
+    #   tmp_i <- param_table[i,]
+    #   list_tmp <- list()
+    #   
+    #   # each row of tmp (tmp_i) is converted to a list (like Python dictionary)
+    #   
+    #   for (name in names(tmp_i)){
+    #     
+    #     list_tmp[[as.character(name)]] <- as.character(tmp_i[[name]])
+    #     
+    #   }
+    #   
+    #   list_all[[i]] <- list_tmp
+    # }
+
+    list_all <- NestedList(param_table)
     key <- paste0("Version_", as.character(ver))
     alter_version[[key]] <- list_all
     
