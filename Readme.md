@@ -25,3 +25,7 @@ Version History
 #### v0.1
 - This the first version. All moduls have their own input included over the first lines. There are files 
 to be removed and also others to be added over the coming versions.
+
+#### v0.2
+- This has a better structured functions and can create a log file though not a good one. Data Uploding functions 
+needs to be modified to use the write_json
