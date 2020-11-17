@@ -11,18 +11,33 @@ MakeModelsInfoFile <- function(ModelFiles, ModelInfoFile){
   #   'C:/Users/HRahmaniBayegi/data_test\\testtable.csv')
   # #ModelFiles <- c('C:/Users/HRahmaniBayegi/data_test/elf_model_test\\Orig_Elf1_200226_0807.csv')
   # ModelInfoFile <- "EarnixModelInfo.json"
+
+  PrintComment(capture_log$prefix, 2, 2, paste0( "Available Models: "))
+  
+  for(i in 1:length(ModelFiles)){
     
-  model_info = list()
-  models = list()
-  seg_model_files = list()
+    PrintComment(capture_log$prefix, 3, 2, paste0( as.character(i), "- ", ModelFiles[i]))
+    
+  }
+  
+  PrintComment(capture_log$prefix, 2, 2, paste0( "Making the ModelInfo: "))
+  
+  model_info <- list()
+  seg_model_files <- list()
+  models <- list()
   
   model_counter <- 1
   for (file in ModelFiles){
     
-
+    PrintComment(capture_log$prefix, 3, 2, paste0('- The model file is: ', file))
+    
     if ( grepl("Elf", basename(file), fixed = TRUE) ){
       
+      PrintComment(capture_log$prefix, 4, 2, paste0('This is an Elf model file: Will be explored separately ...'))
+      
       seg_model_files <- append(seg_model_files, file)
+      
+      model_counter <- model_counter + 1
       
       next
       
@@ -32,35 +47,25 @@ MakeModelsInfoFile <- function(ModelFiles, ModelInfoFile){
     ext <- tools::file_ext(file)
     file_info <- paste0(dirname(file),'/',name_Without_ext,'_Info.',ext)
     
+    PrintComment(capture_log$prefix, 4, 2, paste0('The _Info is: ', file_info))
+    
     df_model <- read.csv(file, stringsAsFactors = FALSE)
     df_info <- read.csv(file_info, stringsAsFactors = FALSE)
+    
+    # Dropping the Intercep
     
     mask <- df_model$Transformations != 'Intercept'
     df_model <- df_model[mask, ]
     
+    # Renaming the two columns
+    
     names(df_model)[names(df_model)=='Transformations'] <- 'formula'
     names(df_model)[names(df_model)=='Beta'] <- 'beta'
     
-    list_all <- list()
-    for (i in 1:nrow(df_model)){
-      
-      tmp_i <- df_model[i,]
-      list_tmp <- list()
-      
-      # each row of tmp (tmp_i) is converted to a list (like Python dictionary)
-      
-      for (name in names(tmp_i)){
-        
-        list_tmp[[as.character(name)]] <- as.character(tmp_i[[name]])
-        
-      }
-      
-      list_all[[i]] <- list_tmp
+    # Re-organizing the dataframe in a shape that can be fed as json
     
-    }
+    list_all <- NestedList(df_model)
     
-    model = list()
-    print(model_counter)
     model = list('parameterName'= df_info$parameterName,
       'versionName'= df_info$versionName,
       'regressionType'= df_info$regressionType,
@@ -86,6 +91,7 @@ MakeModelsInfoFile <- function(ModelFiles, ModelInfoFile){
   model_info[['GlmGamRegression']] = models
   
   
+  # The rest is for the Elf models
   
   models <- list()
   models_formula <- list()
@@ -100,7 +106,16 @@ MakeModelsInfoFile <- function(ModelFiles, ModelInfoFile){
   n <- 0
   
   sorted_files <- stringr::str_sort(seg_model_files)
+  
+  if(length(sorted_files != 0)){  
+    
+    PrintComment(capture_log$prefix, 2, 2, paste0( "Exploring the Elf Models: "))
+      
+  }
+  
   for (file in sorted_files){
+    
+    PrintComment(capture_log$prefix, 3, 2, paste0(model_counter, '- The model file is: ', file))
     
     n <- n+1
     
@@ -108,8 +123,12 @@ MakeModelsInfoFile <- function(ModelFiles, ModelInfoFile){
     ext <- tools::file_ext(file)
     file_info <- paste0(dirname(file),'/',name_Without_ext,'_Info.',ext)
     
+    PrintComment(capture_log$prefix, 4, 2, paste0('The _Info is: ', file_info))
+    
     df_model <- read.csv(file, stringsAsFactors = FALSE)
     df_info <- read.csv(file_info, stringsAsFactors = FALSE)
+    
+    # Renaming the columns 
     
     names(df_model)[names(df_model)=='Transformations'] <- 'formula'
     names(df_model)[names(df_model)=='Beta'] <- 'beta'
@@ -123,7 +142,7 @@ MakeModelsInfoFile <- function(ModelFiles, ModelInfoFile){
     df_model <- df_model[mask, ]
     row.names(df_model) <- NULL
     
-
+    # Generating the formula by stitching the strings using betas and transormations (engineered variables)
     for (i in 1:nrow(df_model)){
       
       transformation <- df_model[i, "formula"]
@@ -134,6 +153,8 @@ MakeModelsInfoFile <- function(ModelFiles, ModelInfoFile){
     
     formula <- paste0(formula,')')
     
+    PrintComment(capture_log$prefix, 4, 2, paste0('The formula is: ', formula))
+    
     model <- list('parameterFolder' = "\\\\Split Models\\\\ELF",
       'parameterName'= df_info[1,'versionName'],
       'versionName'= 'GlmGamRegression - Formula',
@@ -141,7 +162,12 @@ MakeModelsInfoFile <- function(ModelFiles, ModelInfoFile){
     models_formula <- append(models_formula, list(model))
     
     # Overall model
-    if(is.na(overall_model_version_name)){
+    
+    
+    if(is.na(overall_model_version_name)){    # TRUE for the first model
+      
+      # removing the possible numbers/digits to have purely _elf_
+      
       spl <- str_split(model['parameterName'], '_')[[1]]
       spl[grepl('elf', spl)] <- 'elf'
       overall_model_version_name <- paste(spl, collapse = '_')
@@ -154,7 +180,7 @@ MakeModelsInfoFile <- function(ModelFiles, ModelInfoFile){
       
     }
     
-    if (n < n_models){
+    if (n < n_models){ 
 
       overall_model_formula <- paste0(overall_model_formula, df_info[1, 'mappedFilter'])
       overall_model_formula <- paste0(overall_model_formula, ', ',  " '", model['parameterName'], "'", ',')
@@ -164,25 +190,11 @@ MakeModelsInfoFile <- function(ModelFiles, ModelInfoFile){
       overall_model_formula <- paste0(overall_model_formula, " '", model['parameterName'], "'")
       
     }
+    
+    list_all <- NestedList(df_model)
 
-    list_all <- list()
-    for (i in 1:nrow(df_model)){
-      
-      tmp_i <- df_model[i,]
-      list_tmp <- list()
-      
-      # each row of tmp (tmp_i) is converted to a list (like Python dictionary)
-      
-      for (name in names(tmp_i)){
-        
-        list_tmp[[as.character(name)]] <- as.character(tmp_i[[name]])
-        
-      }
-      
-      list_all[[i]] <- list_tmp
-      
-    }
     # GlmGam regression
+    
     model <- list('parameterName'= df_info[1,'versionName'],
       'versionName'= 'GlmGamRegression',
       'regressionType'= df_info[1,'regressionType'],
@@ -191,7 +203,6 @@ MakeModelsInfoFile <- function(ModelFiles, ModelInfoFile){
       'dependentColumn'= df_info[1,'dependentColumn'],
       'transformations'= list_all)
     
-    
     models <- append(models, list(model))
     
   }
@@ -199,6 +210,8 @@ MakeModelsInfoFile <- function(ModelFiles, ModelInfoFile){
   if (length(seg_model_files) > 0){
     
     # strip ','s from both sides (https://stackoverflow.com/questions/10502787/removing-trailing-spaces-with-gsub-in-r)
+    # This is supposed to do the rstrip in Python:         overall_model_formula = overall_model_formula.rstrip(',')
+    # So it drops comas fro either side of it 
     overall_model_formula <- gsub("^,*|(?<= ) |,*$", "", overall_model_formula, perl=T)
     
     overall_model_formula <- paste0(overall_model_formula, ")")
@@ -227,7 +240,6 @@ MakeModelsInfoFile <- function(ModelFiles, ModelInfoFile){
   
   
   return(model_info)
-  
   
 
   
