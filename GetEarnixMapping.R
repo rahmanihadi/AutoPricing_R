@@ -13,9 +13,12 @@ GetEarnixMapping <- function(variables, data_dictionary){
   varlist_notmapped <- list()
   variables <- unique(variables)
   
+  PrintComment(capture_log$prefix, 4, 2, 'The mappings are as follow:')
+  
   for( var in variables ){
     
     statement <- sum(startsWith(var, c("Dep_", "Filter_", "Dummy_", "Random", "Split")))
+    
     if ( statement > 0 ){
       
       next
@@ -23,6 +26,7 @@ GetEarnixMapping <- function(variables, data_dictionary){
     }
     
     var_mapping <- data_dictionary[data_dictionary$Field == var, "Earnix_Mapping"]
+    
     if(length(var_mapping)==1){
       
       var_mapping <- var_mapping
@@ -31,8 +35,17 @@ GetEarnixMapping <- function(variables, data_dictionary){
         mapping <- append(mapping, var_mapping)
         varlist <- append(varlist, var)
         tmplist <- list(c(var, var_mapping))
-        flist <- append(flist, tmplist)       
+        flist <- append(flist, tmplist)  
+        
       }
+      
+      PrintComment(capture_log$prefix, 5, 2, paste0(c(var, var_mapping), collapse = ' --> '))
+      
+    } else {
+      
+      varlist_notmapped <- append(varlist_notmapped, as.list(var_mapping))
+      
+      PrintComment(capture_log$prefix, 5, 2, paste0("NOT MAPPED/WARNING [for model uploading] ... : ", var, " ", length(var_mapping)))
       
     }
 
@@ -40,6 +53,5 @@ GetEarnixMapping <- function(variables, data_dictionary){
     }
   
   return(flist)
-  #return(setNames(as.list(mapping), as.list(varlist)))
-  
+
 }
