@@ -21,6 +21,8 @@ MakeProjectInfoFile <- function(Product, Transaction, EarnixProjectFolder,Earnix
   # 
   # ProjectInfoFile <- "C:/Users/HRahmaniBayegi/softs/pricing/AutoPricing_R/EarnixProjectInfo.json"
   
+  PrintComment(capture_log$prefix, 2, 2, paste0("[", Sys.time(), "] Beginning (2.1) ", ProjectInfoFile))
+  
   df <- data.frame(Product = Product, Transaction = Transaction, 
     EarnixProjectFolder = EarnixProjectFolder, EarnixProjectName=EarnixProjectName, EarnixFolder=EarnixFolder,
     MakeTemplate = MakeTemplate, UploadData = UploadData, UploadModels=UploadModels, CreatePricingVersion=CreatePricingVersion)
@@ -28,6 +30,8 @@ MakeProjectInfoFile <- function(Product, Transaction, EarnixProjectFolder,Earnix
   
   jsonlite::write_json(as.list(df), ProjectInfoFile, pretty=TRUE, auto_unbox =T)
   
-  print(paste0('The ProjectInfoFile is created: ',ProjectInfoFile))
+  PrintComment(capture_log$prefix, 2, 2, paste0("[", Sys.time(), "] Completed (2.1) ", ProjectInfoFile))
+  
+  # print(paste0('The ProjectInfoFile is created: ',ProjectInfoFile))
   
 }
