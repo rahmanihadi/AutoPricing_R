@@ -66,10 +66,10 @@ AutoPricing_R <- function(Brand, Product, Transaction, DatePattern, CreateTempla
   eval(parse(text = capture_log$setup))
   
   PrintComment(capture_log$prefix, 1, 1, paste0("###########################################################"))
-  PrintComment(capture_log$prefix, 1, 1, paste0("# Beginning AutoPricing_R Platform for Source: ", "Source_Appended"))
+  PrintComment(capture_log$prefix, 1, 1, paste0("# Beginning AutoPricing_R Platform for Source: ", "#?#?#?#?#?#"))
   PrintComment(capture_log$prefix, 1, 2, paste0("###########################################################"))
   
-  PrintComment(capture_log$prefix, 1, 2, paste0("Crunch Log file location: ", AutoPricing_R_Log_Path))
+  PrintComment(capture_log$prefix, 1, 2, paste0("AutoPricing_R Log file location: ", AutoPricing_R_Log_Path))
   
   PrintComment(capture_log$prefix, 1, 1, paste0("###########################################################"))
   PrintComment(capture_log$prefix, 1, 1, paste0("# Section 0 - Preparation #################################"))
@@ -79,15 +79,19 @@ AutoPricing_R <- function(Brand, Product, Transaction, DatePattern, CreateTempla
   
   PrintComment(capture_log$prefix, 1, 2, paste0("[", Sys.time(), "] Beginning (0) Preparation"))
   
+
+  #*********************************************************************************************************#
+  #                                                                                                         #
+  # 0.1 Source Function Files                                                                            ####
+  #                                                                                                         #
   #*********************************************************************************************************#
   
-  ############################################## Sourcing the functions
+  # Print message to indicate beginning this stage  
   
-  PrintComment(capture_log$prefix, 1, 1, paste0("###########################################################"))
-  PrintComment(capture_log$prefix, 1, 1, paste0("# Section 1 - Sourcing the Functions ######################"))
-  PrintComment(capture_log$prefix, 1, 2, paste0("###########################################################"))
+  PrintComment(capture_log$prefix, 2, 2, paste0("[", Sys.time(), "] Beginning (0.1) Source Function Files"))
 
-  source(paste0(Working_Directory, "/GenEearnixArgFile.R"))
+
+  source(file.path(Working_Directory, "GenEearnixArgFile.R"))
   source(file.path(Working_Directory, "GenEearnixArgFile.R"))
   source(file.path(Working_Directory, "GetParameters.R")) 
   source(file.path(Working_Directory, "PrepareDatauploading.R"))
@@ -97,43 +101,77 @@ AutoPricing_R <- function(Brand, Product, Transaction, DatePattern, CreateTempla
   source(file.path(Working_Directory, "FakeJson.R"))
   source(file.path(Working_Directory, "MakeModelsInfoFile.R"))
   source(file.path(Working_Directory, "MakeProjectInfoFile.R"))
+  source(file.path(Working_Directory, "NestedList.R"))
+  
+  PrintComment(capture_log$prefix, 2, 2, paste0("[", Sys.time(), "] Completed (0.1) Source Function Files"))
+  
+  
+  
+  #*********************************************************************************************************#
+  #                                                                                                         #
+  # SEC 1 Input Parameter Validation                                                                     ####
+  #                                                                                                         #
+  #*********************************************************************************************************#
+  
+  PrintComment(capture_log$prefix, 1, 1, paste0("###########################################################"))
+  PrintComment(capture_log$prefix, 1, 1, paste0("# Section 1 - Input Parameter Validation ##################"))
+  PrintComment(capture_log$prefix, 1, 2, paste0("###########################################################"))
+  
+  # Print message to indicate beginning this stage
+  
+  PrintComment(capture_log$prefix, 1, 2, paste0("[", Sys.time(), "] Beginning (1) Input Parameter Validation"))
+  
+  PrintComment(capture_log$prefix, 1, 2, paste0("[", Sys.time(), "] Not yet included"))
+  
+  
+  #*********************************************************************************************************#
+  #                                                                                                         #
+  # SEC 2 Creating Earnix project info file                                                                     ####
+  #                                                                                                         #
+  #*********************************************************************************************************#
   
   ############################################## Earnix project info file
  
   PrintComment(capture_log$prefix, 1, 1, paste0("###########################################################"))
-  PrintComment(capture_log$prefix, 1, 1, paste0("# Section 1 - Preparation #################################"))
+  PrintComment(capture_log$prefix, 1, 1, paste0("# Section 2 - Project Info #################################"))
   PrintComment(capture_log$prefix, 1, 1, paste0("# Generating Project info file, EarnixProjectName #########"))
   PrintComment(capture_log$prefix, 1, 1, paste0("# ", EarnixProjectName))
   PrintComment(capture_log$prefix, 1, 2, paste0("###########################################################")) 
-  #print(paste0('Generates the Project info file, EarnixProjectName, ', EarnixProjectName))
+
+  PrintComment(capture_log$prefix, 1, 2, paste0("[", Sys.time(), "] Beginning (2) ProjectInfo"))
   
   MakeProjectInfoFile(Product, Transaction, EarnixProjectFolder, EarnixProjectName, EarnixFolder, ProjectInfoFile)
+  
+  PrintComment(capture_log$prefix, 1, 2, paste0("[", Sys.time(), "] Completed (2) ProjectInfo"))
+  
     
   ############################################## Earnix main arg file 
   
   PrintComment(capture_log$prefix, 1, 1, paste0("###########################################################"))
-  PrintComment(capture_log$prefix, 1, 1, paste0("# Section 2 - Preparation #################################"))
+  PrintComment(capture_log$prefix, 1, 1, paste0("# Section 3 - Argument file #################################"))
   PrintComment(capture_log$prefix, 1, 1, paste0("# Generating Args info file, EarnixMainscriptArgs #########"))
   PrintComment(capture_log$prefix, 1, 1, paste0("# ", EarnixMainscriptArgs))
   PrintComment(capture_log$prefix, 1, 2, paste0("###########################################################"))   
   # print(paste0('Generates the Earnix Args file, EarnixMainscriptArgs, ', EarnixMainscriptArgs))
+ 
+  PrintComment(capture_log$prefix, 1, 2, paste0("[", Sys.time(), "] Beginning (3) EarnixMainscriptArgs"))
   
   GenEearnixArgFile(ProjectInfoFile, DataInfoFile, ModelInfoFile, ReportInfoFile, ParameterFile,
     EarnixMainscriptArgs)
   
-  
+  PrintComment(capture_log$prefix, 1, 2, paste0("[", Sys.time(), "] Completed (3) EarnixMainscriptArgs"))
   
   ############################################## Earnix template file
   
   if (CreateTemplate == 'Y'){
     
     PrintComment(capture_log$prefix, 1, 1, paste0("###########################################################"))
-    PrintComment(capture_log$prefix, 1, 1, paste0("# Section 3 - Preparation #################################"))
+    PrintComment(capture_log$prefix, 1, 1, paste0("# Section 4 - Preparation #################################"))
     PrintComment(capture_log$prefix, 1, 1, paste0("# Creating Template file, ParameterFile ###################"))
     PrintComment(capture_log$prefix, 1, 1, paste0("# ", ParameterFile))
     PrintComment(capture_log$prefix, 1, 2, paste0("###########################################################"))    
     
-    # print(paste0('Generates the Earnix Template file, EarnixParametersTemplate.json, ', ParameterFile))
+    PrintComment(capture_log$prefix, 1, 2, paste0("[", Sys.time(), "] Beginning (4) ParameterFile"))
     
     GetParameters(Product, Transaction, ParameterFile, ConfigsFile)
     
@@ -141,6 +179,9 @@ AutoPricing_R <- function(Brand, Product, Transaction, DatePattern, CreateTempla
     
     #cat(TemplateCommand, file= MainFile ,sep="\n")
     readr::write_lines(TemplateCommand, MainFile, sep = "\n")
+    
+    PrintComment(capture_log$prefix, 1, 2, paste0("[", Sys.time(), "] Completed (4) ParameterFile"))
+    
     
   }
   
@@ -155,16 +196,6 @@ AutoPricing_R <- function(Brand, Product, Transaction, DatePattern, CreateTempla
     PrintComment(capture_log$prefix, 1, 1, paste0("# ", DataInfoFile))
     PrintComment(capture_log$prefix, 1, 2, paste0("###########################################################"))    
     
-    
-    print(paste0('Import data file(s), using EarnixDataInfo.json ', DataInfoFile))
-    
-    print('Following datafiles will be imported on Earnix, ')
-
-    for(file in DataFiles){
-      
-      print(file)
-      
-    }
     
     PrepareDatauploading(Brand, Product, Transaction, DataDictionary,
       DataFiles, DataInfoFile, DatePattern)
@@ -182,16 +213,21 @@ AutoPricing_R <- function(Brand, Product, Transaction, DatePattern, CreateTempla
   
   if (ImportModel == 'Y'){
     
+    PrintComment(capture_log$prefix, 1, 1, paste0("###########################################################"))
+    PrintComment(capture_log$prefix, 1, 1, paste0("# Section 5 -  #################################"))
+    PrintComment(capture_log$prefix, 1, 1, paste0("# Creating ModelInfo file, ModelInfoFile ###################"))
+    PrintComment(capture_log$prefix, 1, 1, paste0("# ", ModelInfoFile))
+    PrintComment(capture_log$prefix, 1, 2, paste0("###########################################################"))    
     
-    print(paste0('Import model(s), using EarnixModelInfo.json ', ModelInfoFile))
+    # print(paste0('Import model(s), using EarnixModelInfo.json ', ModelInfoFile))
     
-    print('Following model files will be imported on Earnix, ')
-    
-    for(file in ModelFiles){
-      
-      print(file)
-      
-    }
+    # print('Following model files will be imported on Earnix, ')
+    # 
+    # for(file in ModelFiles){
+    #   
+    #   print(file)
+    #   
+    # }
     
     MakeModelsInfoFile(ModelFiles, ModelInfoFile)
     
