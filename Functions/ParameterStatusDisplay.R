@@ -6,8 +6,8 @@
 #                                                                                                                    #
 #********************************************************************************************************************#
 
-ParameterStatusDisplay <- function(Brand, Product, Transaction, DatePattern, CreateTemplate, ImportData, ImportModel, 
-  User_Directory, Working_Directory, Opt_Directory, 
+ParameterStatusDisplay <- function(Brand, Product, Transaction, Source, DatePattern, CreateTemplate, ImportData, ImportModel, 
+  User_Directory, Working_Directory, Opt_Directory, EarnixUploader_Package_Directory,
   EarnixFolder, EarnixProjectName, Eernix_Exe,
   DataDictionary, ConfigsFile,
   MakeTemplate, UploadData, UploadModels, CreatePricingVersion,
@@ -16,20 +16,17 @@ ParameterStatusDisplay <- function(Brand, Product, Transaction, DatePattern, Cre
   
   PrintComment(capture_log$prefix, 3, 2, "Parameters Inputted are:")
   
-  # PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na(Brand), 'Brand = NA', paste0('Brand = "', Brand, '"')))) 
-  # PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na(Product), 'Product = NA', paste0('Product = "', Product, '"'))))
-  # PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na(Transaction), 'Transaction = NA', paste0('Transaction = "', Transaction, '"'))))
-  # 
-  # 
   PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na(Brand), 'Brand = NA' , paste0('Brand= "', Brand, '"'))))
   PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na(Product), 'Product = NA' , paste0('Product= "', Product, '"'))))
   PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na(Transaction), 'Transaction = NA' , paste0('Transaction= "', Transaction, '"'))))
+  PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na(Source), 'Source = NA' , paste0('Source= "', Source, '"'))))
   PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na(DatePattern), 'DatePattern = NA' , paste0('DatePattern= "', DatePattern, '"'))))
   PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na(CreateTemplate), 'CreateTemplate = NA' , paste0('CreateTemplate= "', CreateTemplate, '"'))))
   PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na(ImportData), 'ImportData = NA' , paste0('ImportData= "', ImportData, '"'))))
   PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na(ImportModel), 'ImportModel = NA' , paste0('ImportModel= "', ImportModel, '"'))))
   PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na(User_Directory), 'User_Directory = NA' , paste0('User_Directory= "', User_Directory, '"'))))
-  PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na(Working_Directory), 'Working_Directory = NA' , paste0('Working_Directory= "', Working_Directory, '"'))))
+  PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na(EarnixUploader_Working_Directory), 'EarnixUploader_Working_Directory = NA' , paste0('EarnixUploader_Working_Directory= "', EarnixUploader_Working_Directory, '"'))))
+  PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na(EarnixUploader_Package_Directory), 'EarnixUploader_Package_Directory = NA' , paste0('EarnixUploader_Package_Directory= "', EarnixUploader_Package_Directory, '"'))))
   PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na(Opt_Directory), 'Opt_Directory = NA' , paste0('Opt_Directory= "', Opt_Directory, '"'))))
   PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na(EarnixFolder), 'EarnixFolder = NA' , paste0('EarnixFolder= "', EarnixFolder, '"'))))
   PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na(EarnixProjectName), 'EarnixProjectName = NA' , paste0('EarnixProjectName= "', EarnixProjectName, '"'))))
@@ -49,7 +46,7 @@ ParameterStatusDisplay <- function(Brand, Product, Transaction, DatePattern, Cre
   PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na(ReportInfoFile), 'ReportInfoFile = NA' , paste0('ReportInfoFile= "', ReportInfoFile, '"'))))
   PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na(EarnixMainscriptArgs), 'EarnixMainscriptArgs = NA' , paste0('EarnixMainscriptArgs= "', EarnixMainscriptArgs, '"')))) 
 }
-
+EarnixUploader_Package_Directory
 # 
 # for (item in strsplit(x,',')){
 #   fix_0 <- "PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na("
