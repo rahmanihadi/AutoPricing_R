@@ -6,40 +6,43 @@
 #                                                                                                                    #
 #********************************************************************************************************************#
 
-PrepareDatauploading <- function(Brand, Product, Transaction, DataDictionary,
+PrepareDatauploading <- function(Brand, Product, Transaction, Source, Data_Dictionary_Location,
   DataFiles, DataInfoFile, DatePattern) {
   
-  # closeAllConnections()
+  # Fetching all the input parameters
+  
+  InputParAsList <- as.list(match.call())
+  if ( sum(grepl('Source', names(InputParAsList))) & length(DataFiles) >1 ){
+    
+    PrintComment(capture_log$prefix, 2, 2, paste0( "WARNING: Source is an Input, but there are ", length(DataFiles), " DataFiles"))
+    PrintComment(capture_log$prefix, 2, 2, paste0( "WARNING: Verify all DataFiles having the same Source"))
+    
+  }
+  
   # Possbile modifications:
-  # --- Print into file ... that is not clever
-  # --- the dafaframe of DataDictionary can be an input instead of the file
-  
+  # --- the dafaframe of Data_Dictionary_Location can be an input instead of the file
 
-  
   # Brand <- 'RAC'
   # Product <- 'PC'
   # Transaction <- 'NBS'
-  # DataDictionary <- "C:/Users/HRahmaniBayegi/softs/pricing/Dictionaries/DataDictionary/Data_Dictionary_v3.6.csv"
+  # Data_Dictionary_Location <- "C:/Users/HRahmaniBayegi/softs/pricing/Dictionaries/DataDictionary/Data_Dictionary_v3.6.csv"
   # DataFiles <- c("C:/Users/HRahmaniBayegi/data_test\\\\RNW_RAC_PC_NBS_ALL - Final_dummy_11.csv",
   #   "C:/Users/HRahmaniBayegi/data_test\\\\NBS_RAC_PC_NBS_ALL - Final_1.csv",
   #   "C:/Users/HRahmaniBayegi/data_test\\\\Crunch_RNW_RAC_PC_NBS_ALL - Final.csv")
   # DataInfoFile <- "C:/Users/HRahmaniBayegi/softs/pricing/AutoPricing_R/EarnixDataInfo.json"
   # DatePattern <- 'yyyy-mm-dd'
     
-  PrintComment(capture_log$prefix, 2, 2, paste0("[", Sys.time(), "] Beginning (4.1) ", "Reading the DataDaictionary: ", DataDictionary))
+  PrintComment(capture_log$prefix, 2, 2, paste0("[", Sys.time(), "] Beginning (4.1) ", "Reading the DataDaictionary: ", Data_Dictionary_Location))
   
-  DD <- read.csv(DataDictionary, stringsAsFactors = FALSE)
-  
+  DD <- read.csv(Data_Dictionary_Location, stringsAsFactors = FALSE)
   
   data_info <- list()
   
   split_path <- function(x) if (dirname(x)==x) x else c(basename(x),split_path(dirname(x)))
   
-
   # Stu_Counter <- 0
-
-  # sink(DataInfoFile)
   
+  # sink(DataInfoFile)
   # cat('[','\n')
   
   PrintComment(capture_log$prefix, 2, 2, paste0( "Available DataFiles: "))
@@ -61,9 +64,15 @@ PrepareDatauploading <- function(Brand, Product, Transaction, DataDictionary,
     
     SourceChk <- strsplit(split_path(file)[1], split = '_')[[1]]
     
-    Source <- ifelse(startsWith(BaseName, 'Crunch_'), SourceChk[[2]], SourceChk[[1]])
+    Source_Extr <- ifelse(startsWith(BaseName, 'Crunch_'), SourceChk[[2]], SourceChk[[1]])
     
-    PrintComment(capture_log$prefix, 4, 2, paste0("the Source is: ",Source))
+    PrintComment(capture_log$prefix, 4, 2, paste0("the Extracted Source is: ",Source_Extr))
+    
+    if (Source_Extr != Source){
+      
+      PrintComment(capture_log$prefix, 4, 2, paste0("WARNING, the extracted Source, ", Source_Extr, "does not match the input Source, ", Source ))
+      
+    }
     # cat('{','\n')
     # cat(paste0('"dataTableFile": "',file,'",'), "\n")
     
@@ -83,9 +92,7 @@ PrepareDatauploading <- function(Brand, Product, Transaction, DataDictionary,
       
       TableName <- paste0('3. MTC/MTA\\\\', BaseName)
       
-    } else 
-      
-      print('Error: Source is wrong ... This is redundant when variable verification is performed')
+    }
     
     PrintComment(capture_log$prefix, 4, 2, paste0("Table name under Earnix: ",TableName))
     
@@ -142,7 +149,7 @@ PrepareDatauploading <- function(Brand, Product, Transaction, DataDictionary,
   
   # sink()
   # closeAllConnections()
-  jsonlite::write_json(data_info, 'test.json', pretty=TRUE, auto_unbox =T)
+  jsonlite::write_json(data_info, DataInfoFile, pretty=TRUE, auto_unbox =T)
   
   return(data_info)
   
