@@ -5,8 +5,8 @@
 # Generates the EarnixMainScriptArgs.json required for all Earnix actions                     #
 #                                                                                                                    #
 #********************************************************************************************************************#
-GenEearnixArgFile <- function(ProjectInfoFile, DataInfoFile, ModelInfoFile, ReportInfoFile, ParameterFile,
-  EarnixMainscriptArgs){
+GenEarnixArgFile <- function(ProjectInfoFile, DataInfoFile, ModelInfoFile, ReportInfoFile, ParameterFile,
+                             EarnixMainscriptArgs){
   
   # PrintComment(capture_log$prefix, 2, 2, paste0("[", Sys.time(), "] Beginning (3.1) ", EarnixMainscriptArgs))
   

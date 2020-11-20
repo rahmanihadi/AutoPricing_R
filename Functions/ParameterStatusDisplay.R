@@ -8,7 +8,7 @@
 
 ParameterStatusDisplay <- function(Brand, Product, Transaction, Source, DatePattern, CreateTemplate, ImportData, ImportModel, 
                                    User_Directory, Working_Directory, Opt_Directory, EarnixUploader_Package_Directory,
-                                   EarnixFolder, EarnixProjectName, Eernix_Exe,
+                                   EarnixFolder, EarnixProjectName, Earnix_Exe,
                                    DataDictionary, ConfigsFile,
                                    MakeTemplate, UploadData, UploadModels, CreatePricingVersion,
                                    ModelFiles, DataFiles,
@@ -44,7 +44,7 @@ ParameterStatusDisplay <- function(Brand, Product, Transaction, Source, DatePatt
   # PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na(Opt_Directory), 'Opt_Directory = NA' , paste0('Opt_Directory= "', Opt_Directory, '"'))))
   # PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na(EarnixFolder), 'EarnixFolder = NA' , paste0('EarnixFolder= "', EarnixFolder, '"'))))
   # PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na(EarnixProjectName), 'EarnixProjectName = NA' , paste0('EarnixProjectName= "', EarnixProjectName, '"'))))
-  # PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na(Eernix_Exe), 'Eernix_Exe = NA' , paste0('Eernix_Exe= "', Eernix_Exe, '"'))))
+  # PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na(Earnix_Exe), 'Earnix_Exe = NA' , paste0('Earnix_Exe= "', Earnix_Exe, '"'))))
   # PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na(DataDictionary), 'DataDictionary = NA' , paste0('DataDictionary= "',  DataDictionary, '"'))))
   # PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na(ConfigsFile), 'ConfigsFile = NA' , paste0('ConfigsFile= "', ConfigsFile, '"'))))
   # PrintComment(capture_log$prefix, 3, 1, paste0(ifelse(is.na(MakeTemplate), 'MakeTemplate = NA' , paste0('MakeTemplate= "',  MakeTemplate, '"'))))

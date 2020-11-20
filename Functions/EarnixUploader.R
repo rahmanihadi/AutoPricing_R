@@ -8,7 +8,7 @@
 
 EarnixUploader <- function(Brand, Product, Transaction, Source, DatePattern, CreateTemplate, ImportData, ImportModel, 
                            User_Directory, EarnixUploader_Working_Directory, Opt_Directory, EarnixUploader_Package_Directory, 
-                           EarnixFolder, EarnixProjectName, Eernix_Exe,
+                           EarnixFolder, EarnixProjectName, Earnix_Exe,
                            Data_Dictionary_Location, ConfigsFile,
                            MakeTemplate, UploadData, UploadModels, CreatePricingVersion,
                            ModelFiles, DataFiles,
@@ -116,8 +116,7 @@ EarnixUploader <- function(Brand, Product, Transaction, Source, DatePattern, Cre
   
   setwd(EarnixUploader_Working_Directory)
 
-  source(file.path(EarnixUploader_Working_Directory, 'Functions', "GenEearnixArgFile.R"))
-  source(file.path(EarnixUploader_Working_Directory, 'Functions', "GenEearnixArgFile.R"))
+  source(file.path(EarnixUploader_Working_Directory, 'Functions', "GenEarnixArgFile.R"))
   source(file.path(EarnixUploader_Working_Directory, 'Functions', "GetParameters.R")) 
   source(file.path(EarnixUploader_Working_Directory, 'Functions', "PrepareDatauploading.R"))
   source(file.path(EarnixUploader_Working_Directory, 'Functions', "UpdateDataDictionary.R"))
@@ -164,7 +163,7 @@ EarnixUploader <- function(Brand, Product, Transaction, Source, DatePattern, Cre
   
   ParameterStatusDisplay(Brand, Product, Transaction, Source, DatePattern, CreateTemplate, ImportData, ImportModel, 
                         User_Directory, EarnixUploader_Working_Directory, Opt_Directory, EarnixUploader_Package_Directory,
-                        EarnixFolder, EarnixProjectName, Eernix_Exe,
+                        EarnixFolder, EarnixProjectName, Earnix_Exe,
                         Data_Dictionary_Location, ConfigsFile,
                         MakeTemplate, UploadData, UploadModels, CreatePricingVersion,
                         ModelFiles, DataFiles,
@@ -196,7 +195,7 @@ EarnixUploader <- function(Brand, Product, Transaction, Source, DatePattern, Cre
   
   Updated_Parameters <- InputParameterValidation(Brand, Product, Transaction, Source, DatePattern, CreateTemplate, ImportData, ImportModel, 
                                                  User_Directory, EarnixUploader_Working_Directory, Opt_Directory, EarnixUploader_Package_Directory,
-                                                 EarnixFolder, EarnixProjectName, Eernix_Exe,
+                                                 EarnixFolder, EarnixProjectName, Earnix_Exe,
                                                  Data_Dictionary_Location, ConfigsFile,
                                                  MakeTemplate, UploadData, UploadModels, CreatePricingVersion,
                                                  ModelFiles, DataFiles,
@@ -241,8 +240,8 @@ EarnixUploader <- function(Brand, Product, Transaction, Source, DatePattern, Cre
   
   PrintComment(capture_log$prefix, 1, 2, paste0("[", Sys.time(), "] Beginning (3) EarnixMainscriptArgs"))
   
-  GenEearnixArgFile(ProjectInfoFile, DataInfoFile, ModelInfoFile, ReportInfoFile, ParameterFile,
-                    EarnixMainscriptArgs)
+  GenEarnixArgFile(ProjectInfoFile, DataInfoFile, ModelInfoFile, ReportInfoFile, ParameterFile,
+                  EarnixMainscriptArgs)
   EarnixUploaderFileList <- append(EarnixUploaderFileList, EarnixMainscriptArgs)
   
   PrintComment(capture_log$prefix, 1, 2, paste0("The EarnixMainscriptArgs file is generated: ", EarnixMainscriptArgs))
@@ -270,7 +269,7 @@ EarnixUploader <- function(Brand, Product, Transaction, Source, DatePattern, Cre
     GetParameters(Product, Transaction, ParameterFile, ConfigsFile)
     EarnixUploaderFileList <- append(EarnixUploaderFileList, ParameterFile)
     
-    TemplateCommand <- paste0('"', Eernix_Exe, '"', ' -script ', '"', earnix_load_template, '" "', EarnixMainscriptArgs, '"' )
+    TemplateCommand <- paste0('"', Earnix_Exe, '"', ' -script ', '"', earnix_load_template, '" "', EarnixMainscriptArgs, '"' )
     
     readr::write_lines(TemplateCommand, MainFile, sep = "\n")
     
@@ -305,7 +304,7 @@ EarnixUploader <- function(Brand, Product, Transaction, Source, DatePattern, Cre
                          DataFiles, DataInfoFile, DatePattern)
     EarnixUploaderFileList <- append(EarnixUploaderFileList, DataInfoFile) 
     
-    TemplateCommand <- paste0('"', Eernix_Exe, '"', ' -script ', '"', earnix_load_data, '" "', EarnixMainscriptArgs, '"' )
+    TemplateCommand <- paste0('"', Earnix_Exe, '"', ' -script ', '"', earnix_load_data, '" "', EarnixMainscriptArgs, '"' )
     
     AppendTheCommand <- ifelse(CreateTemplate == 'Y', TRUE, FALSE)
     readr::write_lines(TemplateCommand, MainFile, sep = "\n", append = AppendTheCommand)
@@ -339,7 +338,7 @@ EarnixUploader <- function(Brand, Product, Transaction, Source, DatePattern, Cre
     MakeModelsInfoFile(ModelFiles, ModelInfoFile)
     EarnixUploaderFileList <- append(EarnixUploaderFileList, ModelInfoFile)
     
-    TemplateCommand <- paste0('"', Eernix_Exe, '"', ' -script ', '"', earnix_load_model, '" "', EarnixMainscriptArgs, '"' )
+    TemplateCommand <- paste0('"', Earnix_Exe, '"', ' -script ', '"', earnix_load_model, '" "', EarnixMainscriptArgs, '"' )
     
     AppendTheCommand <- ifelse(CreateTemplate == 'Y' | ImportData == 'Y', TRUE, FALSE)
     readr::write_lines(TemplateCommand, MainFile, sep = "\n", append = AppendTheCommand)

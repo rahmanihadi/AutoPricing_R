@@ -8,7 +8,7 @@
 
 InputParameterValidation <- function(Brand, Product, Transaction, Source, DatePattern, CreateTemplate, ImportData, ImportModel, 
   User_Directory, EarnixUploader_Working_Directory, Opt_Directory, EarnixUploader_Package_Directory,
-  EarnixFolder, EarnixProjectName, Eernix_Exe,
+  EarnixFolder, EarnixProjectName, Earnix_Exe,
   Data_Dictionary_Location, ConfigsFile,
   MakeTemplate, UploadData, UploadModels, CreatePricingVersion,
   ModelFiles, DataFiles,
@@ -87,8 +87,8 @@ InputParameterValidation <- function(Brand, Product, Transaction, Source, DatePa
   # File Inputs ####
   #*****************
   
-  FileInputCheck(Input = Eernix_Exe, 
-    Header = deparse(substitute(Eernix_Exe)))
+  FileInputCheck(Input = Earnix_Exe, 
+    Header = deparse(substitute(Earnix_Exe)))
   
   FileInputCheck(Input = User_Directory, 
     Header = deparse(substitute(User_Directory)))
