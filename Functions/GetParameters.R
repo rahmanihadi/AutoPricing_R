@@ -6,13 +6,10 @@
 #                                                                                                                    #
 #********************************************************************************************************************#
 GetParameters <- function(Product, Transaction, ParameterFile, ConfigsFile){
-  # closeAllConnections()
-  
+
   #### Self working example inputs
-  
   #ParameterFile <- "C:/Users/HRahmaniBayegi/softs/pricing/AutoPricing_R/EarnixParametersTemplate.json"
   #ConfigsFile = "C:/Users/HRahmaniBayegi/softs/pricing/AutoPricing/Src/Configs/ParametersTable.csv"
-  
   #Product <- 'PC'
   #Transaction <- 'NBS'
   
@@ -34,7 +31,6 @@ GetParameters <- function(Product, Transaction, ParameterFile, ConfigsFile){
   
   keys <- unique(param_table$Folder)
 
-
   param_out <- list()
   custom_param <- list()
   
@@ -44,7 +40,6 @@ GetParameters <- function(Product, Transaction, ParameterFile, ConfigsFile){
     
     mask <- param_table$Folder == key
     tmp <- param_table[mask,]
-    
     
     if (grepl("\\", key, fixed = TRUE)){
       
@@ -78,39 +73,16 @@ GetParameters <- function(Product, Transaction, ParameterFile, ConfigsFile){
         }
         
       }
+      
     }    
     
-    # keys_sub <- names(tmp)
     list_all <- NestedList(tmp)
-    
-    # list_all <- list()
-    
-    # for (i in 1:nrow(tmp)){
-    #   
-    #   tmp_i <- tmp[i,]
-    #   list_tmp <- list()
-    #   
-    #   # each row of tmp (tmp_i) is converted to a list (like Python dictionary)
-    #   
-    #   for (name in keys_sub){
-    #     
-    #     list_tmp[[as.character(name)]] <- as.character(tmp_i[[name]])
-    #     
-    #   }
-    #   
-    #   list_all[[i]] <- list_tmp
-    #   
-    # }
-    
-    # print(identical(list_all, list_all_tmp))
-    # if(identical(list_all, list_all_tmp) == FALSE){print('Oh lalalalalalalalal')}
     
     custom_param[[as.character(key)]] <- list_all
     
   }
 
   param_out[['CustomParameters']] = custom_param
-
 
   # Core parameters
   
@@ -122,27 +94,9 @@ GetParameters <- function(Product, Transaction, ParameterFile, ConfigsFile){
   
   # converting the dataframe into a list
   
-  # list_all <- list()
   list_all <- NestedList(param_table)
-  # for (i in 1:nrow(param_table)){
-  #   
-  #   tmp_i <- param_table[i,]
-  #   list_tmp <- list()
-  #   
-  #   # each row of tmp (tmp_i) is converted to a list (like Python dictionary)
-  #   
-  #   for (name in names(tmp_i)){
-  #     
-  #     list_tmp[[as.character(name)]] <- as.character(tmp_i[[name]])
-  #     
-  #   }
-  #   
-  #   list_all[[i]] <- list_tmp
-  #   
-  # }
   
   param_out[['CoreParameters']] <- list_all 
-  
   
   # Pricing behavior of the parameters
   
@@ -179,24 +133,6 @@ GetParameters <- function(Product, Transaction, ParameterFile, ConfigsFile){
   
   param_out[['DummyForBehavior']] = list_dummy
   
-  # list_all <- list()
-  
-  # for (i in 1:nrow(param_table)){
-  #   
-  #   tmp_i <- param_table[i,]
-  #   list_tmp <- list()
-  #   
-  #   # each row of tmp (tmp_i) is converted to a list (like Python dictionary)
-  #   
-  #   for (name in names(tmp_i)){
-  #     
-  #     list_tmp[[as.character(name)]] <- as.character(tmp_i[[name]])
-  #     
-  #   }
-  #   
-  #   list_all[[i]] <- list_tmp
-  # }
-  
   list_all <- NestedList(param_table)
 
   param_out[['BehaviorParameters']] = list_all
@@ -218,35 +154,14 @@ GetParameters <- function(Product, Transaction, ParameterFile, ConfigsFile){
     
     names(param_table)[names(param_table)==formula] <- 'Formula'
     names(param_table)[names(param_table)==version] <- 'Version'
-    
-    # list_all <- list()
-    
-    # for (i in 1:nrow(param_table)){
-    #   
-    #   tmp_i <- param_table[i,]
-    #   list_tmp <- list()
-    #   
-    #   # each row of tmp (tmp_i) is converted to a list (like Python dictionary)
-    #   
-    #   for (name in names(tmp_i)){
-    #     
-    #     list_tmp[[as.character(name)]] <- as.character(tmp_i[[name]])
-    #     
-    #   }
-    #   
-    #   list_all[[i]] <- list_tmp
-    # }
 
     list_all <- NestedList(param_table)
     key <- paste0("Version_", as.character(ver))
     alter_version[[key]] <- list_all
     
   }
+  
   param_out[['AlternativeVersions']] = alter_version
-
-  
-  # param_out['AlternativeVersions'] = alter_versions
-  
   
   jsonlite::write_json(param_out, ParameterFile, pretty=TRUE, auto_unbox =T)
 
