@@ -5,6 +5,7 @@
 # Returns a list of mapped variables                       #
 #                                                                                                                    #
 #********************************************************************************************************************#
+
 GetEarnixMapping <- function(variables, data_dictionary){
   
   mapping <- list()
@@ -39,18 +40,19 @@ GetEarnixMapping <- function(variables, data_dictionary){
         
       }
       
-      PrintComment(capture_log$prefix, 5, 2, paste0(c(var, var_mapping), collapse = ' --> '))
+      PrintComment(capture_log$prefix, 5, 1, paste0(c(var, var_mapping), collapse = ' --> '))
       
     } else {
       
       varlist_notmapped <- append(varlist_notmapped, as.list(var_mapping))
       
-      PrintComment(capture_log$prefix, 5, 2, paste0("NOT MAPPED/WARNING [for model uploading] ... : ", var, " ", length(var_mapping)))
+      PrintComment(capture_log$prefix, 5, 1, paste0("NOT MAPPED/WARNING [for model uploading] ... : ", var, " ", length(var_mapping)))
       
     }
 
-    
-    }
+  }
+  
+  PrintComment(capture_log$prefix, 4, 2, 'The mappings are done!')
   
   return(flist)
 

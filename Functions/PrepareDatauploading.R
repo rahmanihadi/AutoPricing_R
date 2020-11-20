@@ -7,7 +7,7 @@
 #********************************************************************************************************************#
 
 PrepareDatauploading <- function(Brand, Product, Transaction, Source, Data_Dictionary_Location,
-  DataFiles, DataInfoFile, DatePattern) {
+                                 DataFiles, DataInfoFile, DatePattern) {
   
   # Fetching all the input parameters
   
@@ -21,60 +21,41 @@ PrepareDatauploading <- function(Brand, Product, Transaction, Source, Data_Dicti
   
   # Possbile modifications:
   # --- the dafaframe of Data_Dictionary_Location can be an input instead of the file
-
-  # Brand <- 'RAC'
-  # Product <- 'PC'
-  # Transaction <- 'NBS'
-  # Data_Dictionary_Location <- "C:/Users/HRahmaniBayegi/softs/pricing/Dictionaries/DataDictionary/Data_Dictionary_v3.6.csv"
-  # DataFiles <- c("C:/Users/HRahmaniBayegi/data_test\\\\RNW_RAC_PC_NBS_ALL - Final_dummy_11.csv",
-  #   "C:/Users/HRahmaniBayegi/data_test\\\\NBS_RAC_PC_NBS_ALL - Final_1.csv",
-  #   "C:/Users/HRahmaniBayegi/data_test\\\\Crunch_RNW_RAC_PC_NBS_ALL - Final.csv")
-  # DataInfoFile <- "C:/Users/HRahmaniBayegi/softs/pricing/AutoPricing_R/EarnixDataInfo.json"
-  # DatePattern <- 'yyyy-mm-dd'
     
-  PrintComment(capture_log$prefix, 2, 2, paste0("[", Sys.time(), "] Beginning (4.1) ", "Reading the DataDaictionary: ", Data_Dictionary_Location))
-  
   DD <- read.csv(Data_Dictionary_Location, stringsAsFactors = FALSE)
-  
+
   data_info <- list()
   
   split_path <- function(x) if (dirname(x)==x) x else c(basename(x),split_path(dirname(x)))
   
-  # Stu_Counter <- 0
-  
-  # sink(DataInfoFile)
-  # cat('[','\n')
-  
   PrintComment(capture_log$prefix, 2, 2, paste0( "Available DataFiles: "))
   
+  Nprnt <- rep(1,length(DataFiles))
+  Nprnt[length(DataFiles)] <- 2
   for(i in 1:length(DataFiles)){
     
-    PrintComment(capture_log$prefix, 3, 2, paste0( as.character(i), "- ", DataFiles[i]))
+    PrintComment(capture_log$prefix, 3, Nprnt[i], paste0( as.character(i), "- ", DataFiles[i]))
     
   }
   
-
+  PrintComment(capture_log$prefix, 3, 2, paste0("[", Sys.time(), "] Beginning (5.1) Data Info extraction"))
+  file_counter <- 0
+  
   for(file in DataFiles){
     
-    PrintComment(capture_log$prefix, 3, 2, paste0("peparation for: ",file))
+    PrintComment(capture_log$prefix, 3, 2, paste0("[", Sys.time(), "] Beginning (5.1.", file_counter,") Data Info for ", file))
     
     BaseName <- tools::file_path_sans_ext(split_path(file)[1])
-    
-    PrintComment(capture_log$prefix, 4, 2, paste0("the basename is: ",BaseName))
-    
+    PrintComment(capture_log$prefix, 4, 1, paste0("the basename is: ",BaseName))
     SourceChk <- strsplit(split_path(file)[1], split = '_')[[1]]
-    
     Source_Extr <- ifelse(startsWith(BaseName, 'Crunch_'), SourceChk[[2]], SourceChk[[1]])
-    
-    PrintComment(capture_log$prefix, 4, 2, paste0("the Extracted Source is: ",Source_Extr))
+    PrintComment(capture_log$prefix, 4, 1, paste0("the Extracted Source is: ",Source_Extr))
     
     if (Source_Extr != Source){
       
       PrintComment(capture_log$prefix, 4, 2, paste0("WARNING, the extracted Source, ", Source_Extr, "does not match the input Source, ", Source ))
       
     }
-    # cat('{','\n')
-    # cat(paste0('"dataTableFile": "',file,'",'), "\n")
     
     if ( Source == "Aquote" ){
       
@@ -94,32 +75,27 @@ PrepareDatauploading <- function(Brand, Product, Transaction, Source, Data_Dicti
       
     }
     
-    PrintComment(capture_log$prefix, 4, 2, paste0("Table name under Earnix: ",TableName))
+    PrintComment(capture_log$prefix, 4, 2, paste0("Table name under Earnix: ", TableName))
     
-    # cat(paste0('"earnixTableName": "',TableName,'",'), "\n")
     dependents <- paste0(c(Brand, Product, Transaction, Source), collapse = ', ')
     
-    PrintComment(capture_log$prefix, 4, 2, paste0("Compilation of the DD based on: ", dependents))
+    PrintComment(capture_log$prefix, 4, 2, paste0("Compilation of the DD based on (Brand, Product, Transaction, Source): ", dependents))
     
     updated_dict <- UpdateDataDictionary(Brand, Product, Transaction, Source, DD)
     
     dim_ud <- paste0(dim(updated_dict), collapse = 'x')
-    
-    PrintComment(capture_log$prefix, 4, 2, paste0("The the dimension of the compiled DD is: ", dim_ud))
+    PrintComment(capture_log$prefix, 4, 1, paste0("The the dimension of the compiled DD is: ", dim_ud))
     
     
     variables <- colnames(read.csv(file, nrows = 1))
     
     PrintComment(capture_log$prefix, 4, 2, paste0("There are ", length(variables)  ," columns in: ", file))
     
-    
     # perform the Earnix mapping
     
-    PrintComment(capture_log$prefix, 4, 2, paste0("Performing the Earnix mapping, using columns and the updated DD"))
+    PrintComment(capture_log$prefix, 4, 1, paste0("Performing the Earnix mapping, using columns and the updated DD"))
     
     map <- GetEarnixMapping(variables, updated_dict)
-    
-    # FakeJson('map', map)
     
     # fetch the variable types
     
@@ -127,14 +103,7 @@ PrepareDatauploading <- function(Brand, Product, Transaction, Source, Data_Dicti
     
     types <- GetDataType(variables, updated_dict)
     
-    # print the variable type
-    # FakeJson('Types', types)
-    
-    # cat(paste0('"datePattern": "',DatePattern,'"\n'))
-    
-    # Stu_Counter <- Stu_Counter + 1
-    # LoopClose <- ifelse(Stu_Counter == length(DataFiles), "}\n", "},\n")
-    # cat(LoopClose)
+    PrintComment(capture_log$prefix, 4, 2, paste0("Variable types, are found"))
     
     info = list('dataTableFile'= file, 
       'earnixTableName'= TableName,
@@ -142,13 +111,10 @@ PrepareDatauploading <- function(Brand, Product, Transaction, Source, Data_Dicti
       'Types'= types, 
       'datePattern'= DatePattern)
     data_info <- append(data_info, list(info))
+    
+    file_counter <- file_counter +1
   }  
        
-  
-  # cat("]")
-  
-  # sink()
-  # closeAllConnections()
   jsonlite::write_json(data_info, DataInfoFile, pretty=TRUE, auto_unbox =T)
   
   return(data_info)

@@ -23,11 +23,15 @@ UpdateDataDictionary <- function(Brand, Product, Transaction, Source, data_dicti
   DD0_keep_p <- DD0_keep[mask, ]
   DD0_p <- DD0[mask, ]
   
+  Nprnt <- rep(1,nrow(DD0_p))
+  Nprnt[nrow(DD0_p)] <- 2
   for(i in 1:nrow(DD0_p)){
     
-    PrintComment(capture_log$prefix, 5, 2, paste0(c(DD0_keep_p[i, "Field"], DD0_p[i, "Field"]), collapse = ' --> '))
+    PrintComment(capture_log$prefix, 5, Nprnt[i], paste0(c(DD0_keep_p[i, "Field"], DD0_p[i, "Field"]), collapse = ' --> '))
     
   }
+  
+  PrintComment(capture_log$prefix, 4, 2, paste0('Done with the first renaming'))
   
   # Those of Type = "Review" are renamed to "Review_" + "Live_Name"
   
@@ -45,11 +49,15 @@ UpdateDataDictionary <- function(Brand, Product, Transaction, Source, data_dicti
     
   } 
   
+  Nprnt <- rep(1,nrow(DD0_p))
+  Nprnt[nrow(DD0_p)] <- 2
   for(i in 1:nrow(DD0_p)){
     
-    PrintComment(capture_log$prefix, 5, 2, paste0(c(DD0_keep_p[i, "Field"], DD0_p[i, "Field"]), collapse = ' --> '))
+    PrintComment(capture_log$prefix, 5, Nprnt[i], paste0(c(DD0_keep_p[i, "Field"], DD0_p[i, "Field"]), collapse = ' --> '))
     
   }
+  
+  PrintComment(capture_log$prefix, 4, 2, paste0('Done with the second renaming'))
   
   # selecting only seven columns 
   
