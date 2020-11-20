@@ -24,7 +24,7 @@ User_Directory <- "C:/Users/HRahmaniBayegi/outputs/autopricing/MyFirstTest_3-1" 
 EarnixUploader_Package_Directory <- "C:/Users/HRahmaniBayegi/softs/pricing/EarnixUploader/EarnixUploader_R_Packages"
 EarnixUploader_Working_Directory <- "C:/Users/HRahmaniBayegi/softs/pricing/EarnixUploader" # Hosts the R files
 
-Opt_Directory <- "C:/Users/HRahmaniBayegi/softs/pricing/AutoPricing_0.6.3/Optimization" # Hosts the .js files
+#Opt_Directory <- "C:/Users/HRahmaniBayegi/softs/pricing/EarnixUploader/Functions" # Hosts the .js files
 
 ############################################## Earnix stuff 
 
@@ -38,7 +38,7 @@ EarnixFolder <- "\\\\Budget Group\\\\2019\\\\All\\\\Development\\\\Test"
 
 ###################### Earnix template name
 
-EarnixProjectName <- "MyFirstTest_4" 
+EarnixProjectName <- "MyFirstTest_5" 
 
 ###################### The data dictionary for earnix mapping and data type
 
@@ -83,7 +83,7 @@ source(file.path(EarnixUploader_Working_Directory, "Functions", "EarnixUploader.
 Run_Location <<- 'Pricing'
 
 EarnixUploader(Brand, Product, Transaction, Source, DatePattern, CreateTemplate, ImportData,  ImportModel,
-              User_Directory, EarnixUploader_Working_Directory, Opt_Directory, EarnixUploader_Package_Directory, 
+              User_Directory, EarnixUploader_Working_Directory, EarnixUploader_Package_Directory, 
               EarnixFolder, EarnixProjectName, Earnix_Exe,
               Data_Dictionary_Location, ConfigsFile,
               MakeTemplate, UploadData, UploadModels, CreatePricingVersion,

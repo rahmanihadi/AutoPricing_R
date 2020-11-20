@@ -7,7 +7,7 @@
 #********************************************************************************************************************#
 
 ParameterStatusDisplay <- function(Brand, Product, Transaction, Source, DatePattern, CreateTemplate, ImportData, ImportModel, 
-                                   User_Directory, Working_Directory, Opt_Directory, EarnixUploader_Package_Directory,
+                                   User_Directory, Working_Directory, EarnixUploader_Package_Directory,
                                    EarnixFolder, EarnixProjectName, Earnix_Exe,
                                    DataDictionary, ConfigsFile,
                                    MakeTemplate, UploadData, UploadModels, CreatePricingVersion,

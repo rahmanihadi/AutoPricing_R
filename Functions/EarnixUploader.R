@@ -7,7 +7,7 @@
 #********************************************************************************************************************#
 
 EarnixUploader <- function(Brand, Product, Transaction, Source, DatePattern, CreateTemplate, ImportData, ImportModel, 
-                           User_Directory, EarnixUploader_Working_Directory, Opt_Directory, EarnixUploader_Package_Directory, 
+                           User_Directory, EarnixUploader_Working_Directory, EarnixUploader_Package_Directory, 
                            EarnixFolder, EarnixProjectName, Earnix_Exe,
                            Data_Dictionary_Location, ConfigsFile,
                            MakeTemplate, UploadData, UploadModels, CreatePricingVersion,
@@ -94,9 +94,9 @@ EarnixUploader <- function(Brand, Product, Transaction, Source, DatePattern, Cre
   
   ############################################## JavaScript files (they are the original ones developed by Haifang) ... Should be moved to the _Dev
   
-  earnix_load_template = file.path(Opt_Directory, "auto_pricing.js")
-  earnix_load_data = file.path(Opt_Directory, "upload_data.js") 
-  earnix_load_model = file.path(Opt_Directory, "upload_model.js")
+  earnix_load_template = file.path(EarnixUploader_Working_Directory, 'Functions', "auto_pricing.js")
+  earnix_load_data = file.path(EarnixUploader_Working_Directory, 'Functions', "upload_data.js") 
+  earnix_load_model = file.path(EarnixUploader_Working_Directory, 'Functions', "upload_model.js")
   
   ############################################## This is where the data and models will be uploaded
   
@@ -162,7 +162,7 @@ EarnixUploader <- function(Brand, Product, Transaction, Source, DatePattern, Cre
   PrintComment(capture_log$prefix, 2, 2, paste0("[", Sys.time(), "] Beginning (0.3) Parameter Status Display"))
   
   ParameterStatusDisplay(Brand, Product, Transaction, Source, DatePattern, CreateTemplate, ImportData, ImportModel, 
-                        User_Directory, EarnixUploader_Working_Directory, Opt_Directory, EarnixUploader_Package_Directory,
+                        User_Directory, EarnixUploader_Working_Directory, EarnixUploader_Package_Directory,
                         EarnixFolder, EarnixProjectName, Earnix_Exe,
                         Data_Dictionary_Location, ConfigsFile,
                         MakeTemplate, UploadData, UploadModels, CreatePricingVersion,
@@ -194,7 +194,7 @@ EarnixUploader <- function(Brand, Product, Transaction, Source, DatePattern, Cre
   # Function call to InputParameterValidation
   
   Updated_Parameters <- InputParameterValidation(Brand, Product, Transaction, Source, DatePattern, CreateTemplate, ImportData, ImportModel, 
-                                                 User_Directory, EarnixUploader_Working_Directory, Opt_Directory, EarnixUploader_Package_Directory,
+                                                 User_Directory, EarnixUploader_Working_Directory, EarnixUploader_Package_Directory,
                                                  EarnixFolder, EarnixProjectName, Earnix_Exe,
                                                  Data_Dictionary_Location, ConfigsFile,
                                                  MakeTemplate, UploadData, UploadModels, CreatePricingVersion,

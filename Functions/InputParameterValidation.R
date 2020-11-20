@@ -7,7 +7,7 @@
 #********************************************************************************************************************#
 
 InputParameterValidation <- function(Brand, Product, Transaction, Source, DatePattern, CreateTemplate, ImportData, ImportModel, 
-  User_Directory, EarnixUploader_Working_Directory, Opt_Directory, EarnixUploader_Package_Directory,
+  User_Directory, EarnixUploader_Working_Directory, EarnixUploader_Package_Directory,
   EarnixFolder, EarnixProjectName, Earnix_Exe,
   Data_Dictionary_Location, ConfigsFile,
   MakeTemplate, UploadData, UploadModels, CreatePricingVersion,
