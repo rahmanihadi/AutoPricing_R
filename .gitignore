@@ -7,3 +7,5 @@ test.json
 *.json
 
 EarnixUploader_R_Packages
+
+Functions/*.log
