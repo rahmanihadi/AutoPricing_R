@@ -1,10 +1,11 @@
 #********************************************************************************************************************#
 #                                                                                                                    #
-# GetParameters                                                                                              ####
+# GetParameters                                                                                                   ####
 #                                                                                                                    #
-# Generates the Parmeters Template file required for making a template on Earnix                      #
+# Generates the Parmeters Template file required for making a template on Earnix                                     #
 #                                                                                                                    #
 #********************************************************************************************************************#
+
 GetParameters <- function(Product, Transaction, ParameterFile, ConfigsFile){
 
   #### Self working example inputs
@@ -20,15 +21,24 @@ GetParameters <- function(Product, Transaction, ParameterFile, ConfigsFile){
 
   all_table = read.csv(ConfigsFile, stringsAsFactors = FALSE)
   
+  #********************************************************************************************************************#
+  #                                                                                                                    #
+  # Buiding the `Custom Parameters`                                                                                 ####
+  #                                                                                                                    #
+  #********************************************************************************************************************#
+  
   mask <- (all_table$CustomParameter == "Y") & (all_table[[prod_trans]] == "Y")
   
   param_table <- all_table[mask, c('Parameter', 'ParameterComment', 'DataType', 'Version', formula, 'Folder')]
+
+  # Majority of "Version" and "ParameterComment" are empty cells. We replace them with "NA"
 
   param_table$Version <- sub("^$", "NA", param_table$Version)  
   param_table$ParameterComment <- sub("^$", "NA", param_table$ParameterComment)
   
   names(param_table)[names(param_table)==formula] <- 'Formula'
   
+  # Usually 21-22 unique Folders exist out of ~ 150 
   keys <- unique(param_table$Folder)
 
   param_out <- list()
@@ -41,12 +51,19 @@ GetParameters <- function(Product, Transaction, ParameterFile, ConfigsFile){
     mask <- param_table$Folder == key
     tmp <- param_table[mask,]
     
+    # Extracting Folders out of each key
+    
     if (grepl("\\", key, fixed = TRUE)){
       
-      library(stringr)
-      key_1 <- gsub("\\\\", "___",key)
-      splited <- str_split(key_1, "__", simplify=TRUE)
+      # Replace the double backslash (\\) with double underscore (__): so the string operation can be performed easier
+      # Note the use of "4" backslash to search for double backslash
+      
+      key_1 <- gsub("\\\\", "__",key)
+      splited <- stringr::str_split(key_1, "__", simplify=TRUE)
       folder <- splited[1] 
+      
+      # Each `folder` will be a folder under the `Custom Parameters` in Earnix Modeling
+      # Check if the folder was not already listed (or added) [or check if this is a new folder]
       
       n_exist <- grep(paste0("^",folder,'$'), keys)
 
@@ -56,8 +73,13 @@ GetParameters <- function(Product, Transaction, ParameterFile, ConfigsFile){
         
       }
       
+      # The following loop works if 'splited' contains three or more parts
+      # Note: "seq_len(0)" does not work if injected into ifesle
+      
       DoLoop <- ifelse(length(splited)>2, c(1:length(splited)-1), 'BETE' )
       if (DoLoop=='BETE'){ DoLoop<- seq_len(0)}
+      
+      # Rare loop ! (Currently never occurs)
       
       for(i in DoLoop){
         
@@ -83,9 +105,13 @@ GetParameters <- function(Product, Transaction, ParameterFile, ConfigsFile){
   }
 
   param_out[['CustomParameters']] = custom_param
-
-  # Core parameters
   
+  #********************************************************************************************************************#
+  #                                                                                                                    #
+  # Buiding the `Core parameters`                                                                                   ####
+  #                                                                                                                    #
+  #********************************************************************************************************************#
+
   mask_core <- all_table$Folder == 'CoreParameters' & all_table[[prod_trans]] == 'Y'
   
   param_table <-  all_table[mask_core, c('Parameter', formula)]
@@ -98,7 +124,11 @@ GetParameters <- function(Product, Transaction, ParameterFile, ConfigsFile){
   
   param_out[['CoreParameters']] <- list_all 
   
-  # Pricing behavior of the parameters
+  #********************************************************************************************************************#
+  #                                                                                                                    #
+  # Buiding the `Pricing Behavior of Variables`                                                                     ####
+  #                                                                                                                    #
+  #********************************************************************************************************************#
   
   mask_dummy <- all_table$Folder == 'PricingBehavior' & all_table[[prod_trans]] == 'Y'
   
