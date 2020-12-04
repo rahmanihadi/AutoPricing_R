@@ -2,15 +2,27 @@
 #                                                                                                                    #
 # MakeModelsInfoFile                                                                                              ####
 #                                                                                                                    #
-# Generates the EarnixModelInfo.json required for importing models on an Earnix template                     #
+# Generates the EarnixModelInfo.json required for importing models on an Earnix template                             #
 #                                                                                                                    #
 #********************************************************************************************************************#
-MakeModelsInfoFile <- function(ModelFiles, ModelInfoFile){
-  
-  # ModelFiles <- c('C:/Users/HRahmaniBayegi/data_test\\RenewalDemand_H2OGLM_dummy_11.csv',
-  #   'C:/Users/HRahmaniBayegi/data_test\\testtable.csv')
-  # #ModelFiles <- c('C:/Users/HRahmaniBayegi/data_test/elf_model_test\\Orig_Elf1_200226_0807.csv')
-  # ModelInfoFile <- "EarnixModelInfo.json"
+#
+#********************************************************************************************************************#
+#                                                                                                                    #
+# Impoertant Note:                                                                                                ####
+#                                                                                                                    #
+# The segmentaion part is still working with the _Info file input                                                    #
+#                                                                                                                    #
+#********************************************************************************************************************#
+#
+#********************************************************************************************************************#
+#                                                                                                                    #
+# Possible next step modifications:                                                                               ####
+#                                                                                                                    #
+# Make it closer to the current style of Earnix model import where betas remains~1 after fitting                     #
+#                                                                                                                    #
+#********************************************************************************************************************#
+
+MakeModelsInfoFile <- function(ModelFiles, ModelInfoFile, ParamasFile, submodels, Filters, VersionNames, TableName, ModelFit){
 
   PrintComment(capture_log$prefix, 2, 2, paste0( "Available Models: "))
   
@@ -22,12 +34,18 @@ MakeModelsInfoFile <- function(ModelFiles, ModelInfoFile){
   
   PrintComment(capture_log$prefix, 2, 2, paste0( "Making the ModelInfo: "))
   
+  submodelParams <- read.csv(ParamasFile, stringsAsFactors = FALSE)
+  
   model_info <- list()
   seg_model_files <- list()
   models <- list()
   
   model_counter <- 1
-  for (file in ModelFiles){
+
+  for (i in 1: length(ModelFiles)){
+    
+    file <- ModelFiles[i]
+    submodel <- submodels[i]
     
     PrintComment(capture_log$prefix, 3, 2, paste0('- The model file is: ', file))
     
@@ -45,33 +63,76 @@ MakeModelsInfoFile <- function(ModelFiles, ModelInfoFile){
     
     name_Without_ext <- tools::file_path_sans_ext(basename(file))
     ext <- tools::file_ext(file)
-    file_info <- paste0(dirname(file),'/',name_Without_ext,'_Info.',ext)
     
-    PrintComment(capture_log$prefix, 4, 2, paste0('The _Info is: ', file_info))
+    df_model_orig <- read.csv(file, stringsAsFactors = FALSE)
     
-    df_model <- read.csv(file, stringsAsFactors = FALSE)
-    df_info <- read.csv(file_info, stringsAsFactors = FALSE)
+    # If later on people like to use both old Variables.csv and new ones as well
+    # if ( ncol(df_model_orig)==1 | sum(grepl('Variables',colnames(df_model_orig)))!=0 ){
+    # 
     
-    # Dropping the Intercep
+    # Replace the ((1)) with 'INTERCEPT'  
+    Tr_Under_Rep <- gsub('[^[:alnum:][:blank:]) (<>\'+-=.?&/"\\-_]', "___", df_model_orig$Variables)
+    Mask_Const <- grepl('1))___', Tr_Under_Rep)
+    df_model_orig[Mask_Const,] <- paste0("(Intercept)", '*',stringr::str_split(Tr_Under_Rep[Mask_Const], "___", simplify=TRUE)[2] )
+    Flag_Hybrid <- ifelse(sum(Mask_Const) ==0, TRUE, FALSE)
     
-    mask <- df_model$Transformations != 'Intercept'
-    df_model <- df_model[mask, ]
+    # For now I do not know how to fit the Intercept or how to handle it (explicit equation is the way to handle it ... for later)
+    # Omitting the Intercept for the sake of now
+    
+    mask <- !grepl('(Intercept)', df_model_orig$Variables)
+    df_model_orig <- df_model_orig[mask, 'Variables', drop=FALSE]
+    
+    mask_params <- submodelParams$submodel == submodel
+    
+    dependentColumn <- submodel
+    parameterName <- submodelParams[mask_params,'parameterName']
+
+    if( sum(grepl(submodel, c('NETDIF', 'YOY'))) ==0 ){
+      
+      regressionType <- 'Logistic'
+      
+    } else {
+      
+      regressionType <- 'Linear'
+      
+    }
+    
+    # Dropping the Intercept
+    
+    # mask <- df_model$Transformations != 'Intercept' & df_model$Transformations != '(Intercept)'
+    # df_model <- df_model[mask, ]
     
     # Renaming the two columns
-    
-    names(df_model)[names(df_model)=='Transformations'] <- 'formula'
-    names(df_model)[names(df_model)=='Beta'] <- 'beta'
+    # names(df_model)[names(df_model)=='Transformations'] <- 'formula'
+    # names(df_model)[names(df_model)=='Beta'] <- 'beta'
     
     # Re-organizing the dataframe in a shape that can be fed as json
+    names(df_model_orig)[names(df_model_orig)=='Variables'] <- 'formula'
+    row.names(df_model_orig) <- NULL
+    list_all <- list()
     
-    list_all <- NestedList(df_model)
-    
-    model = list('parameterName'= df_info$parameterName,
-      'versionName'= df_info$versionName,
-      'regressionType'= df_info$regressionType,
-      'sample'= df_info$sample ,
-      'filter' = df_info$filter,
-      'dependentColumn'= df_info$dependentColumn,
+    if (ModelFit){
+   
+      for (ii in 1:nrow(df_model_orig)){
+        tmp <- list()
+        tmp['formula'] <- df_model_orig[ii, 'formula']
+        list_all <- append(list_all, list(tmp))
+        
+      }
+      
+    } else {
+      
+      df_model <- ModelFilePreparation(df_model_orig, Flag_Hybrid)
+      list_all <- NestedList(df_model)
+      
+    }
+
+    model = list('parameterName'= parameterName,
+      'versionName'= VersionNames[i],
+      'regressionType'= regressionType,
+      'sample'= TableName ,
+      'filter' = Filters[i],
+      'dependentColumn'= dependentColumn,
       'transformations' = list_all)
 
     model_counter <- model_counter +1

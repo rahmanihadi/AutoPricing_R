@@ -6,13 +6,13 @@
 #                                                                                                                    #
 #********************************************************************************************************************#
 
-EarnixUploader <- function(Brand, Product, Transaction, Source, DatePattern, CreateTemplate, ImportData, ImportModel, 
+EarnixUploader <- function(Brand, Product, Transaction, Source, Submodels, Filters, VersionNames,
+                           DatePattern, CreateTemplate, ImportData, ImportModel, ModelFit, 
                            User_Directory, EarnixUploader_Working_Directory, EarnixUploader_Package_Directory, 
                            EarnixFolder, EarnixProjectName, Earnix_Exe,
-                           Data_Dictionary_Location, ConfigsFile,
+                           Data_Dictionary_Location, ConfigsFile, ParamasFile,
                            MakeTemplate, UploadData, UploadModels, CreatePricingVersion,
-                           ModelFiles, DataFiles,
-                           DataInfoFile, ModelInfoFile, ParameterFile, ProjectInfoFile, ReportInfoFile, EarnixMainscriptArgs){
+                           ModelFiles, DataFiles){
  
   #*********************************************************************************************************#
   #                                                                                                         #
@@ -23,6 +23,7 @@ EarnixUploader <- function(Brand, Product, Transaction, Source, DatePattern, Cre
   options(scipen = 999)
   options(max.print = 1000000)
   options(width = 10000)
+  # options(warn=1)
   
   # Close any open connections
   
@@ -45,7 +46,7 @@ EarnixUploader <- function(Brand, Product, Transaction, Source, DatePattern, Cre
   
   #*********************************************************************************************************#
   #                                                                                                         #
-  # Setup Logging                                                                                        ####
+  # 0.1 Setup Logging                                                                                        ####
   #                                                                                                         #
   #*********************************************************************************************************#
   
@@ -76,23 +77,85 @@ EarnixUploader <- function(Brand, Product, Transaction, Source, DatePattern, Cre
   
   EarnixUploaderFileList <- list()
   
-  ############################################## The file containing the executables ... Where should it be saved?
+  #*********************************************************************************************************#
+  #                                                                                                         #
+  # 0.2 Setup Json files and executable commands file                                                    ####
+  #                                                                                                         #
+  #*********************************************************************************************************#
   
-  MainFile <- file.path(User_Directory, "CommandsFile.sh")
+  EarnixMainscriptArgs <- list()
+    
+  #*********************************************************************************************************#
+  #                                                                                                         #
+  # 0.2.1 Main Script containing the commands and the Project Info                                       ####
+  #                                                                                                         #
+  #*********************************************************************************************************#
+  
+  direname_Main <- file.path(User_Directory, '6. EarnixUploader', 'Main', Source)
+  dir.create(direname_Main, recursive = TRUE, showWarnings = FALSE)
+  MainFile <- file.path(direname_Main, "CommandsFile.sh")
+  ProjectInfoFile <- file.path(direname_Main, "EarnixProjectInfo.json")
   EarnixUploaderFileList <- append(EarnixUploaderFileList, MainFile)
   
   PrintComment(capture_log$prefix, 1, 2, paste0("CMD/Java commands are stored in: ", MainFile))
   
-  ############################################## Outputs of EarnixUploader, all are JSON files ... Where should it be saved?
+  #*********************************************************************************************************#
+  #                                                                                                         #
+  # 0.2.2 Create Template input file                                                                     ####
+  #                                                                                                         #
+  #*********************************************************************************************************#
   
-  DataInfoFile <-  file.path(User_Directory, "EarnixDataInfo.json") 
-  ModelInfoFile <- file.path(User_Directory, "EarnixModelInfo.json") 
-  ParameterFile <- file.path(User_Directory, "EarnixParametersTemplate.json") 
-  ProjectInfoFile <- file.path(User_Directory, "EarnixProjectInfo.json") 
-  ReportInfoFile <- file.path(User_Directory, "EarnixReportInfo.json")
-  EarnixMainscriptArgs <- file.path(User_Directory, "EarnixMainScriptArgs.json")
+  if ( CreateTemplate=='Y' ){
+    
+    direname_Template <- file.path(User_Directory, '6. EarnixUploader', 'Template', Source)
+    dir.create(direname_Template, recursive = TRUE, showWarnings = FALSE)
+    ParameterFile <- file.path(direname_Template, "EarnixParametersTemplate.json")
+    EarnixMainscriptArgs['Template'] <- file.path(direname_Template, "EarnixMainScriptArgs.json")
+    
+  }
   
-  ############################################## JavaScript files (they are the original ones developed by Haifang) ... Should be moved to the _Dev
+  #*********************************************************************************************************#
+  #                                                                                                         #
+  # 0.2.3 Create DataInfo input file                                                                     ####
+  #                                                                                                         #
+  #*********************************************************************************************************#
+  
+  if ( ImportData=='Y' ){
+    
+    direname_Data <- file.path(User_Directory, '6. EarnixUploader', 'Data', Source)
+    dir.create(direname_Data, recursive = TRUE, showWarnings = FALSE)
+    DataInfoFile <-  file.path(direname_Data, "EarnixDataInfo.json") 
+    EarnixMainscriptArgs['Data'] <- file.path(direname_Data, "EarnixMainScriptArgs.json")
+    
+  }
+  
+  #*********************************************************************************************************#
+  #                                                                                                         #
+  # 0.2.4 Create ModelInfo input file                                                                    ####
+  #                                                                                                         #
+  #*********************************************************************************************************#
+  
+  if (ImportModel=='Y'){
+    
+    submodels <- eval(parse(text = Submodels))
+    ModelInfoFile <- rep('', length(submodels))
+    ModelArgs <- rep('', length(submodels))
+    
+    for (i in 1:length(submodels)){
+      
+      direname_Model <- file.path(User_Directory, '6. EarnixUploader', 'Model', Source, submodels[i])
+      dir.create(direname_Model, recursive = TRUE, showWarnings = FALSE)
+      ModelInfoFile_s <- file.path(direname_Model, "EarnixModelInfo.json") 
+      ModelInfoFile[i] <- ModelInfoFile_s
+      ModelArgs[i] <- file.path(direname_Model, "EarnixMainScriptArgs.json")
+      
+    }
+    
+    EarnixMainscriptArgs['Model'] <- list(ModelArgs)
+    
+  }
+  
+  ############################################## JavaScript files (they are the original ones developed by Haifang)
   
   earnix_load_template = file.path(EarnixUploader_Working_Directory, 'Functions', "auto_pricing.js")
   earnix_load_data = file.path(EarnixUploader_Working_Directory, 'Functions', "upload_data.js") 
@@ -106,7 +169,7 @@ EarnixUploader <- function(Brand, Product, Transaction, Source, DatePattern, Cre
   
   #*********************************************************************************************************#
   #                                                                                                         #
-  # 0.1 Source Function Files                                                                            ####
+  # 0.3 Source Function Files                                                                            ####
   #                                                                                                         #
   #*********************************************************************************************************#
   
@@ -116,7 +179,6 @@ EarnixUploader <- function(Brand, Product, Transaction, Source, DatePattern, Cre
   
   setwd(EarnixUploader_Working_Directory)
 
-  source(file.path(EarnixUploader_Working_Directory, 'Functions', "GenEarnixArgFile.R"))
   source(file.path(EarnixUploader_Working_Directory, 'Functions', "GetParameters.R")) 
   source(file.path(EarnixUploader_Working_Directory, 'Functions', "PrepareDatauploading.R"))
   source(file.path(EarnixUploader_Working_Directory, 'Functions', "UpdateDataDictionary.R"))
@@ -127,6 +189,7 @@ EarnixUploader <- function(Brand, Product, Transaction, Source, DatePattern, Cre
   source(file.path(EarnixUploader_Working_Directory, 'Functions', "NestedList.R"))
   source(file.path(EarnixUploader_Working_Directory, 'Functions', "ParameterStatusDisplay.R"))
   source(file.path(EarnixUploader_Working_Directory, 'Functions', "InputParameterValidation.R"))
+  source(file.path(EarnixUploader_Working_Directory, 'Functions', "ModelFilePreparation.R"))
   
   # Print message to indicate completing this stage
   
@@ -134,7 +197,7 @@ EarnixUploader <- function(Brand, Product, Transaction, Source, DatePattern, Cre
   
   #*********************************************************************************************************#
   #                                                                                                         #
-  # 0.2 Load Packages                                                                                    ####
+  # 0.4 Load Packages                                                                                    ####
   #                                                                                                         #
   #*********************************************************************************************************#
   
@@ -155,19 +218,19 @@ EarnixUploader <- function(Brand, Product, Transaction, Source, DatePattern, Cre
   
   #*********************************************************************************************************#
   #                                                                                                         #
-  # 0.3 Parameter Status Display                                                                         ####
+  # 0.5 Parameter Status Display                                                                         ####
   #                                                                                                         #
   #*********************************************************************************************************#
   
   PrintComment(capture_log$prefix, 2, 2, paste0("[", Sys.time(), "] Beginning (0.3) Parameter Status Display"))
   
-  ParameterStatusDisplay(Brand, Product, Transaction, Source, DatePattern, CreateTemplate, ImportData, ImportModel, 
+  ParameterStatusDisplay(Brand, Product, Transaction, Source, Submodels, Filters, VersionNames,
+                        DatePattern, CreateTemplate, ImportData, ImportModel, ModelFit, 
                         User_Directory, EarnixUploader_Working_Directory, EarnixUploader_Package_Directory,
                         EarnixFolder, EarnixProjectName, Earnix_Exe,
-                        Data_Dictionary_Location, ConfigsFile,
+                        Data_Dictionary_Location, ConfigsFile, ParamasFile, 
                         MakeTemplate, UploadData, UploadModels, CreatePricingVersion,
-                        ModelFiles, DataFiles,
-                        DataInfoFile, ModelInfoFile, ParameterFile, ProjectInfoFile, ReportInfoFile, EarnixMainscriptArgs)
+                        ModelFiles, DataFiles)
   
   # Print message to indicate completing this stage
   
@@ -193,13 +256,13 @@ EarnixUploader <- function(Brand, Product, Transaction, Source, DatePattern, Cre
   
   # Function call to InputParameterValidation
   
-  Updated_Parameters <- InputParameterValidation(Brand, Product, Transaction, Source, DatePattern, CreateTemplate, ImportData, ImportModel, 
+  Updated_Parameters <- InputParameterValidation(Brand, Product, Transaction, Source, Submodels, Filters, VersionNames,
+                                                 DatePattern, CreateTemplate, ImportData, ImportModel, ModelFit,  
                                                  User_Directory, EarnixUploader_Working_Directory, EarnixUploader_Package_Directory,
                                                  EarnixFolder, EarnixProjectName, Earnix_Exe,
-                                                 Data_Dictionary_Location, ConfigsFile,
+                                                 Data_Dictionary_Location, ConfigsFile, ParamasFile,
                                                  MakeTemplate, UploadData, UploadModels, CreatePricingVersion,
-                                                 ModelFiles, DataFiles,
-                                                 DataInfoFile, ModelInfoFile, ParameterFile, ProjectInfoFile, ReportInfoFile, EarnixMainscriptArgs)
+                                                 ModelFiles, DataFiles)
   
   # Print message to indicate completing this stage
   
@@ -225,32 +288,10 @@ EarnixUploader <- function(Brand, Product, Transaction, Source, DatePattern, Cre
   PrintComment(capture_log$prefix, 1, 2, paste0("The ProjectInfo file is generated: ", ProjectInfoFile))
   
   PrintComment(capture_log$prefix, 1, 2, paste0("[", Sys.time(), "] Completed (2) ProjectInfo"))
-  
+ 
   #*********************************************************************************************************#
   #                                                                                                         #
-  # SEC 3 Generating the JSON file EarnixMainscriptArgs                                                  ####
-  #                                                                                                         #
-  #*********************************************************************************************************#
-  
-  PrintComment(capture_log$prefix, 1, 1, paste0("###########################################################"))
-  PrintComment(capture_log$prefix, 1, 1, paste0("# Section 3 - Earnix Main Argument file ###################"))
-  PrintComment(capture_log$prefix, 1, 2, paste0("###########################################################"))
-  
-  # Print message to indicate beginning this stage
-  
-  PrintComment(capture_log$prefix, 1, 2, paste0("[", Sys.time(), "] Beginning (3) EarnixMainscriptArgs"))
-  
-  GenEarnixArgFile(ProjectInfoFile, DataInfoFile, ModelInfoFile, ReportInfoFile, ParameterFile,
-                  EarnixMainscriptArgs)
-  EarnixUploaderFileList <- append(EarnixUploaderFileList, EarnixMainscriptArgs)
-  
-  PrintComment(capture_log$prefix, 1, 2, paste0("The EarnixMainscriptArgs file is generated: ", EarnixMainscriptArgs))
-  
-  PrintComment(capture_log$prefix, 1, 2, paste0("[", Sys.time(), "] Completed (3) EarnixMainscriptArgs")) 
-    
-  #*********************************************************************************************************#
-  #                                                                                                         #
-  # SEC 4 Generating the Earnix template file                                                            ####
+  # SEC 3 Generating the Earnix template file                                                            ####
   #                                                                                                         #
   #*********************************************************************************************************#
   
@@ -267,9 +308,13 @@ EarnixUploader <- function(Brand, Product, Transaction, Source, DatePattern, Cre
     PrintComment(capture_log$prefix, 1, 2, paste0("[", Sys.time(), "] Beginning (4) Earnix Parameter template file ", ParameterFile))
     
     GetParameters(Product, Transaction, ParameterFile, ConfigsFile)
-    EarnixUploaderFileList <- append(EarnixUploaderFileList, ParameterFile)
     
-    TemplateCommand <- paste0('"', Earnix_Exe, '"', ' -script ', '"', earnix_load_template, '" "', EarnixMainscriptArgs, '"' )
+    df <- data.frame(projectInfoFile=ProjectInfoFile, parametersTemplateFile=ParameterFile)
+    jsonlite::write_json(as.list(df), EarnixMainscriptArgs$Template, pretty=TRUE, auto_unbox =T)   
+    
+    EarnixUploaderFileList <- append(EarnixUploaderFileList, c(ParameterFile,EarnixMainscriptArgs$Template))
+    
+    TemplateCommand <- paste0('"', Earnix_Exe, '"', ' -script ', '"', earnix_load_template, '" "', EarnixMainscriptArgs$Template, '"' )
     
     readr::write_lines(TemplateCommand, MainFile, sep = "\n")
     
@@ -281,12 +326,38 @@ EarnixUploader <- function(Brand, Product, Transaction, Source, DatePattern, Cre
     
   }
   
+  #*********************************************************************************************************#
+  #                                                                                                         #
+  # SEC 4 Generating the Earnix data import file                                                         ####
+  #                                                                                                         #
+  #*********************************************************************************************************#
   
-  #*********************************************************************************************************#
-  #                                                                                                         #
-  # SEC 5 Generating the Earnix data import file                                                         ####
-  #                                                                                                         #
-  #*********************************************************************************************************#
+  # Extracting the location of the data this can be used for model import as well
+  
+  if (ImportData == 'Y' | ImportModel == 'Y'){
+    
+    split_path <- function(x) if (dirname(x)==x) x else c(basename(x),split_path(dirname(x)))
+    BaseName <- tools::file_path_sans_ext(split_path(DataFiles[1])[1])
+    
+    if ( Source == "Aquote" ){
+      
+      TableName <- paste0('4. Optimisation\\\\', BaseName)
+      
+    } else if ( Source == "NBS" ){
+      
+      TableName <- paste0('1. NBS\\\\', BaseName)
+      
+    } else if ( Source == "RNW" ){
+      
+      TableName <- paste0('2. RNW\\\\', BaseName)
+      
+    } else if ( Source == "MTC" ){
+      
+      TableName <- paste0('3. MTC/MTA\\\\', BaseName)
+      
+    }  
+    
+  }
   
   PrintComment(capture_log$prefix, 1, 1, paste0("###########################################################"))
   PrintComment(capture_log$prefix, 1, 1, paste0("# Section 5 - Creating DataInfo file, DataInfoFile ########"))
@@ -301,13 +372,17 @@ EarnixUploader <- function(Brand, Product, Transaction, Source, DatePattern, Cre
     PrintComment(capture_log$prefix, 1, 2, paste0("[", Sys.time(), "] Beginning (5) Earnix Data Info file, ", DataInfoFile))
     
     PrepareDatauploading(Brand, Product, Transaction, Source, Data_Dictionary_Location,
-                         DataFiles, DataInfoFile, DatePattern)
-    EarnixUploaderFileList <- append(EarnixUploaderFileList, DataInfoFile) 
+                         DataFiles, DataInfoFile, DatePattern, TableName)
     
-    TemplateCommand <- paste0('"', Earnix_Exe, '"', ' -script ', '"', earnix_load_data, '" "', EarnixMainscriptArgs, '"' )
+    df <- data.frame(projectInfoFile=ProjectInfoFile, dataInfoFile=DataInfoFile)
+    jsonlite::write_json(as.list(df), EarnixMainscriptArgs$Data, pretty=TRUE, auto_unbox =T)   
+    
+    EarnixUploaderFileList <- append(EarnixUploaderFileList, c(DataInfoFile,EarnixMainscriptArgs$Data)) 
+    
+    DataCommand <- paste0('"', Earnix_Exe, '"', ' -script ', '"', earnix_load_data, '" "',EarnixMainscriptArgs$Data, '"' )
     
     AppendTheCommand <- ifelse(CreateTemplate == 'Y', TRUE, FALSE)
-    readr::write_lines(TemplateCommand, MainFile, sep = "\n", append = AppendTheCommand)
+    readr::write_lines(DataCommand, MainFile, sep = "\n", append = AppendTheCommand)
     
     PrintComment(capture_log$prefix, 1, 2, paste0("[", Sys.time(), "] Completed (5) creation of Earnix Data Info file"))
     
@@ -319,7 +394,7 @@ EarnixUploader <- function(Brand, Product, Transaction, Source, DatePattern, Cre
   
   #*********************************************************************************************************#
   #                                                                                                         #
-  # SEC 6 Generating the Earnix model import file                                                         ####
+  # SEC 5 Generating the Earnix model import file                                                         ####
   #                                                                                                         #
   #*********************************************************************************************************#
   
@@ -330,18 +405,26 @@ EarnixUploader <- function(Brand, Product, Transaction, Source, DatePattern, Cre
   # Print message to indicate beginning this stage
   
   PrintComment(capture_log$prefix, 1, 2, paste0("[", Sys.time(), "] Beginning (6) creation of Earnix Model Info file"))
-  
+ 
   if (ImportModel == 'Y'){
     
     PrintComment(capture_log$prefix, 1, 2, paste0("[", Sys.time(), "] Beginning (6) Model Info file, ", ModelInfoFile))
     
-    MakeModelsInfoFile(ModelFiles, ModelInfoFile)
-    EarnixUploaderFileList <- append(EarnixUploaderFileList, ModelInfoFile)
-    
-    TemplateCommand <- paste0('"', Earnix_Exe, '"', ' -script ', '"', earnix_load_model, '" "', EarnixMainscriptArgs, '"' )
-    
     AppendTheCommand <- ifelse(CreateTemplate == 'Y' | ImportData == 'Y', TRUE, FALSE)
-    readr::write_lines(TemplateCommand, MainFile, sep = "\n", append = AppendTheCommand)
+    
+    modelFit <- eval(parse(text = ModelFit))
+    for (i in 1:length(ModelFiles)){
+      
+      MakeModelsInfoFile(ModelFiles[i], ModelInfoFile[i], ParamasFile, submodels[i], Filters[i], VersionNames[i], TableName, modelFit[i])
+      
+      df <- data.frame(projectInfoFile=ProjectInfoFile, modelInfoFile=ModelInfoFile[i])
+      jsonlite::write_json(as.list(df), EarnixMainscriptArgs$Model[i], pretty=TRUE, auto_unbox =T)   
+      
+      EarnixUploaderFileList <- append(EarnixUploaderFileList, c(ModelInfoFile[i],EarnixMainscriptArgs$Model[i]))
+      TemplateCommand <- paste0('"', Earnix_Exe, '"', ' -script ', '"', earnix_load_model, '" "', EarnixMainscriptArgs$Model[i], '"' )
+      readr::write_lines(TemplateCommand, MainFile, sep = "\n", append = AppendTheCommand)
+      
+    }
     
     PrintComment(capture_log$prefix, 1, 2, paste0("[", Sys.time(), "] Completed (6) Earnix Model Info file"))
     

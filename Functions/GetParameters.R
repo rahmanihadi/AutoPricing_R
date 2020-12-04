@@ -51,7 +51,7 @@ GetParameters <- function(Product, Transaction, ParameterFile, ConfigsFile){
     mask <- param_table$Folder == key
     tmp <- param_table[mask,]
     
-    # Extracting Folders out of each key
+    # Extracting Folders out of each key (if any)
     
     if (grepl("\\", key, fixed = TRUE)){
       

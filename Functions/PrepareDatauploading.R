@@ -7,9 +7,10 @@
 #********************************************************************************************************************#
 
 PrepareDatauploading <- function(Brand, Product, Transaction, Source, Data_Dictionary_Location,
-                                 DataFiles, DataInfoFile, DatePattern) {
+                                 DataFiles, DataInfoFile, DatePattern, TableName) {
   
   # Fetching all the input parameters
+  # Check if Source is an Input parameter
   
   InputParAsList <- as.list(match.call())
   if ( sum(grepl('Source', names(InputParAsList))) & length(DataFiles) >1 ){
@@ -41,6 +42,7 @@ PrepareDatauploading <- function(Brand, Product, Transaction, Source, Data_Dicti
   PrintComment(capture_log$prefix, 3, 2, paste0("[", Sys.time(), "] Beginning (5.1) Data Info extraction"))
   file_counter <- 0
   
+  # The loop is not neccessary anymore as we decided to run the uploader with a single Source/dataset at a time
   for(file in DataFiles){
     
     PrintComment(capture_log$prefix, 3, 2, paste0("[", Sys.time(), "] Beginning (5.1.", file_counter,") Data Info for ", file))
@@ -54,24 +56,6 @@ PrepareDatauploading <- function(Brand, Product, Transaction, Source, Data_Dicti
     if (Source_Extr != Source){
       
       PrintComment(capture_log$prefix, 4, 2, paste0("WARNING, the extracted Source, ", Source_Extr, "does not match the input Source, ", Source ))
-      
-    }
-    
-    if ( Source == "Aquote" ){
-      
-      TableName <- paste0('4. Optimisation\\\\', BaseName)
-      
-    } else if ( Source == "NBS" ){
-      
-      TableName <- paste0('1. NBS\\\\', BaseName)
-      
-    } else if ( Source == "RNW" ){
-      
-      TableName <- paste0('2. RNW\\\\', BaseName)
-      
-    } else if ( Source == "MTC" ){
-      
-      TableName <- paste0('3. MTC/MTA\\\\', BaseName)
       
     }
     
@@ -104,6 +88,28 @@ PrepareDatauploading <- function(Brand, Product, Transaction, Source, Data_Dicti
     types <- GetDataType(variables, updated_dict)
     
     PrintComment(capture_log$prefix, 4, 2, paste0("Variable types, are found"))
+    
+    if ( Source=='RNW' ){
+      
+      mask_map <- grepl("Review_Quote_AddOnTax", map)
+      if ( sum(mask_map)==0 ){
+        
+        tmplist <- list(c("Review_Quote_AddOnTax", "Quote_AddOnTax"))
+        map <- append(map, tmplist)  
+        
+      }
+      
+      mask_types <- grepl("Review_Quote_AddOnTax", types)
+      if ( sum(mask_types)==0 ){
+        
+        tmplist <- list(c("Review_Quote_AddOnTax", "Real"))
+        types <- append(types, tmplist)
+        
+      }
+      
+      PrintComment(capture_log$prefix, 4, 2, paste0('"Review_Quote_AddOnTax" has been mapped to "Quote_AddOnTax" though does not exist in the DataDictionary... '))
+
+    }
     
     info = list('dataTableFile'= file, 
       'earnixTableName'= TableName,

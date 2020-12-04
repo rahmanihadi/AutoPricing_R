@@ -6,13 +6,15 @@
 #                                                                                                                    #
 #********************************************************************************************************************#
 
-InputParameterValidation <- function(Brand, Product, Transaction, Source, DatePattern, CreateTemplate, ImportData, ImportModel, 
-  User_Directory, EarnixUploader_Working_Directory, EarnixUploader_Package_Directory,
-  EarnixFolder, EarnixProjectName, Earnix_Exe,
-  Data_Dictionary_Location, ConfigsFile,
-  MakeTemplate, UploadData, UploadModels, CreatePricingVersion,
-  ModelFiles, DataFiles,
-  DataInfoFile, ModelInfoFile, ParameterFile, ProjectInfoFile, ReportInfoFile, EarnixMainscriptArgs) {
+InputParameterValidation <- function(Brand, Product, Transaction, Source, Submodels, filter, versionName,
+                                     DatePattern, CreateTemplate, ImportData, ImportModel, ModelFit, 
+                                     User_Directory, EarnixUploader_Working_Directory, EarnixUploader_Package_Directory,
+                                     EarnixFolder, EarnixProjectName, Earnix_Exe,
+                                     Data_Dictionary_Location, ConfigsFile, ParamasFile, 
+                                     MakeTemplate, UploadData, UploadModels, CreatePricingVersion,
+                                     ModelFiles, DataFiles) {
+  
+  options(warn=1)
   
   Updated_Parameters <- list()
   
@@ -77,6 +79,78 @@ InputParameterValidation <- function(Brand, Product, Transaction, Source, DatePa
   # Those parameters that can take mutiple values from a fixed list of options
   
   Multiple_Fixed_Inputs <- list()
+  
+  Multiple_Fixed_Inputs$ModelFit <- c(TRUE, FALSE)
+  
+  if (Source == "NBS") {
+    
+    # Submodels applicable to both motor and home
+    
+    Multiple_Fixed_Inputs$Submodels <- c("Legal", "Switcher", "InverseSwitcher")
+    
+    # Submodels applicable to motor only
+    
+    if (Product %in% c("PC", "LC")) {
+      
+      Multiple_Fixed_Inputs$Submodels <- c(Multiple_Fixed_Inputs$Submodels, "PNCD", "GRC", "Breakdown", "KeyCare", "PAC")
+      
+    }
+    
+    # Submodels applicable to van only
+    
+    if (Product == "LC") {
+      
+      Multiple_Fixed_Inputs$Submodels <- c(Multiple_Fixed_Inputs$Submodels, "Tools")
+      
+    }
+    
+    # Submodels applicable to home only  
+    
+    if (Product == "HH") {
+      
+      Multiple_Fixed_Inputs$Submodels <- c(Multiple_Fixed_Inputs$Submodels, "KeyCover", "HEA")
+      
+    }
+    
+  } 
+  
+  if (Source == "RNW") {
+    
+    # Submodels applicable to both NBS and RNW Transaction
+    
+    Multiple_Fixed_Inputs$Submodels <- c("RenewalDemand", "NETDIF", "YOY")
+    
+    # Submodels applicable to RNW Transaction only
+    
+    if (Transaction == "RNW") {
+      
+      Multiple_Fixed_Inputs$Submodels <- c(Multiple_Fixed_Inputs$Submodels, "Discount")
+      
+    }
+    
+  }  
+  
+  if (Source == "MTC") {
+    
+    # Submodels applicable to both motor and home
+    
+    Multiple_Fixed_Inputs$Submodels <- c("MTA", "Cancellation")
+    
+    # Submodels applicable to motor only
+    
+    if (Product %in% c("PC", "LC")) {
+      
+      Multiple_Fixed_Inputs$Submodels <- c(Multiple_Fixed_Inputs$Submodels, "BadFee", "BadPrm")
+      
+    }
+    
+  } 
+  
+  if (Source == "Aquote") {
+    
+    Multiple_Fixed_Inputs$Submodels <- c("Origination")
+    
+  }
   
   
   # Call the MultipleFixedInputCheck function on Multiple_Fixed_Inputs
